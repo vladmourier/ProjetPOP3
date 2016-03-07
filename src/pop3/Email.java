@@ -29,6 +29,30 @@ public class Email {
         this.destinataires = s;
         this.message = message;
     }
+
+    public String getExpediteur() {
+        return expediteur;
+    }
+
+    public void setExpediteur(String expediteur) {
+        this.expediteur = expediteur;
+    }
+
+    public ArrayList<String> getDestinataires() {
+        return destinataires;
+    }
+
+    public void setDestinataires(ArrayList<String> destinataires) {
+        this.destinataires = destinataires;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
     
     
 }
