@@ -3,19 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pop3;
+package pop3.Server;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import pop3.ObjetConnecte;
 
 /**
  *
@@ -45,37 +41,8 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.BOS = new BufferedOutputStream(this.OS);
             this.IS = Sclient.getInputStream();
             this.BIS = new BufferedInputStream(this.IS);
-            System.out.println("J'attend un requ�te");
-            this.BIS.read(buffer);
-            System.out.println(new String(buffer));
-            //Pour recuperer le fichier cible : on split new String(buffer) selon GET
-            //puis on split la deuxième string avec http et on prend la première
-            String chemin = new String(buffer).split("GET")[1].split("HTTP")[0];
-            String adresseFichier = racine+chemin.substring(1);
-
-            RandomAccessFile monFichier = new RandomAccessFile(adresseFichier, "r");
             
-            //this.BOS.write("".getBytes());
             
-            Byte a = null;
-            try {
-                a = monFichier.readByte();
-            } catch (EOFException e) {
-                System.out.println(e.getMessage());
-            }
-            boolean b = true;
-
-            while (b) {
-                this.BOS.write(a);
-                try {
-                    a = monFichier.readByte();
-                } catch (EOFException e) {
-                    b = false;
-                }
-            }
-            System.out.println("Je r�pond � la requ�te");
-            this.BOS.flush();
-
         } catch (IOException ex) {
 
         }
@@ -98,5 +65,19 @@ public class Communication extends ObjetConnecte implements Runnable {
 
     public void setAddress_dest(InetAddress address_dest) {
         this.address_dest = address_dest;
+    }
+    
+    public boolean sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
+        this.BOS.write(m.getMessage().getBytes());
+        this.BOS.flush();
+        return true;
+    }
+    
+    public POP3ServerMessage retrieveUserMessages(){
+        return null;
+    }
+    
+    public POP3ServerMessage retrieveUserMessage(String userEmail, int i){
+        return null;
     }
 }
