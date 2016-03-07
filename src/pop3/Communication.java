@@ -54,19 +54,9 @@ public class Communication extends ObjetConnecte implements Runnable {
             String adresseFichier = racine+chemin.substring(1);
 
             RandomAccessFile monFichier = new RandomAccessFile(adresseFichier, "r");
-
-            this.BOS.write("HTTP/1.1 200 OK\r\n".getBytes());
-            this.BOS.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n".getBytes());
-            this.BOS.write("Server: Apache/0.8.4\r\n".getBytes());
-            if (adresseFichier.endsWith("jpg")) {
-                this.BOS.write("Content-Type: image/jpeg\r\n".getBytes());
-            } else if (adresseFichier.endsWith("html")) {
-                this.BOS.write("Content-Type: text/html\r\n".getBytes());
-            }
-            this.BOS.write(new String("Content-Length: " + monFichier.length() + "\r\n").getBytes());
-            this.BOS.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n".getBytes());
-            this.BOS.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n".getBytes());
-            this.BOS.write("\r\n".getBytes());
+            
+            //this.BOS.write("".getBytes());
+            
             Byte a = null;
             try {
                 a = monFichier.readByte();
@@ -87,40 +77,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.BOS.flush();
 
         } catch (IOException ex) {
-            System.out.println("Fichier introuvable");
-            try {
-                RandomAccessFile monFichier = new RandomAccessFile("web/404.html", "r");
-                this.BOS.write("HTTP/1.1 404 Not Found\r\n".getBytes());
-                this.BOS.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n".getBytes());
-                this.BOS.write("Server: Apache/0.8.4\r\n".getBytes());
-                this.BOS.write("Content-Type: text/html\r\n".getBytes());
-                this.BOS.write(new String("Content-Length: " + monFichier.length() + "\r\n").getBytes());
-                this.BOS.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n".getBytes());
-                this.BOS.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n".getBytes());
-                this.BOS.write("\r\n".getBytes());
-                
-                 Byte a = null;
-            try {
-                a = monFichier.readByte();
-            } catch (EOFException e) {
-                System.out.println(e.getMessage());
-            }
-            boolean b = true;
 
-            while (b) {
-                this.BOS.write(a);
-                try {
-                    a = monFichier.readByte();
-                } catch (EOFException e) {
-                    b = false;
-                }
-            }
-                this.BOS.write("\r\n".getBytes());
-                this.BOS.flush();
-                
-            } catch (IOException ex1) {
-                Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex1);
-            }
         }
     }
 
