@@ -7,15 +7,10 @@ package pop3;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -75,5 +70,13 @@ public class Communication extends ObjetConnecte implements Runnable {
         this.BOS.write(m.getMessage().getBytes());
         this.BOS.flush();
         return true;
+    }
+    
+    public POP3ServerMessage retrieveUserMessages(){
+        return null;
+    }
+    
+    public POP3ServerMessage retrieveUserMessage(String userEmail, int i){
+        return null;
     }
 }

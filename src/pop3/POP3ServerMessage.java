@@ -10,9 +10,26 @@ package pop3;
  * @author Vladimir
  */
 public class POP3ServerMessage {
+
+    /**
+     * L'email concerné par le message du serveur
+     * ex : le mail concerné par un retrieve
+     */
+    public Email email;
+    
+    /**
+     * Le corps du message server ; Doit commencer par +OK ou -ERR
+     */
     public String message;
+    /**
+     * Booléen indiquant si l'action du client a pu etre effectuée
+     */
     public boolean isOk;
     
+    
+    ///
+    /// Constantes identifiant les messages que le serveur doit envoyer
+    ///
     public static final String SERVER_READY = "ready";
     public static final String SERVER_SIGNING_OFF = "signing off";
     public static final String SERVER_WAITING_FOR_PASS = "waiting for pass";
@@ -55,6 +72,14 @@ public class POP3ServerMessage {
 
     public POP3ServerMessage(String message) {
         this.message = message;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public void setEmail(Email email) {
+        this.email = email;
     }
     
 }

@@ -12,6 +12,10 @@ import java.util.ArrayList;
  * @author Vladimir
  */
 public class Email {
+    /**
+     * Id du message parmi les messages d'un user donné
+     */
+    private int id;
     private String expediteur;
     private ArrayList<String> destinataires;
     private String message;
