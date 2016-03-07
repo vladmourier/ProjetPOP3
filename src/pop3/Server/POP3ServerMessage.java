@@ -3,14 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pop3;
+package pop3.Server;
+
+import pop3.Email;
 
 /**
  *
  * @author Vladimir
  */
 public class POP3ServerMessage {
-
+    /**
+     * The email address of the logged user
+     */
+    public String address;
     /**
      * L'email concerné par le message du serveur
      * ex : le mail concerné par un retrieve
@@ -33,7 +38,7 @@ public class POP3ServerMessage {
     public static final String SERVER_READY = "ready";
     public static final String SERVER_SIGNING_OFF = "signing off";
     public static final String SERVER_WAITING_FOR_PASS = "waiting for pass";
-    public static final String SERVER_LOCKING_MAILBOX = "locking mailbox";
+    public static final String SERVER_INIT_MAILBOX = "initializing mailbox";
     public static final String SERVER_SEND_INFOS = "sending infos";
     public static final String SERVER_DELETING_MESSAGE = "deleting message";
 
@@ -49,6 +54,10 @@ public class POP3ServerMessage {
         return this;
     }
 
+    public POP3ServerMessage getMsgServerInitMailbox(){
+        return null;
+    }
+    
     public String getMessage() {
         return message;
     }
