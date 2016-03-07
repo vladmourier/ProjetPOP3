@@ -5,6 +5,10 @@
  */
 package pop3.Server;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Vladimir
@@ -15,7 +19,13 @@ public class POP3 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+       Serveur s;
+        try {
+            s = new Serveur(110);
+                   s.run();
+        } catch (IOException ex) {
+            Logger.getLogger(POP3.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }
