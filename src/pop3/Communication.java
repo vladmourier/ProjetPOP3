@@ -72,7 +72,8 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
     
     public boolean sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
-        this.OS.write(m.getMessage().getBytes());
+        this.BOS.write(m.getMessage().getBytes());
+        this.BOS.flush();
         return true;
     }
 }
