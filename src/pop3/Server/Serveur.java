@@ -18,7 +18,6 @@ import java.util.logging.Logger;
  */
 public class Serveur{
     ServerSocket socketServer;
-
     
    public Serveur(int port_s) throws SocketException, IOException{
     this.socketServer = new ServerSocket(port_s);

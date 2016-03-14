@@ -46,6 +46,8 @@ public class Communication extends ObjetConnecte implements Runnable {
         } catch (IOException ex) {
 
         }
+        
+        
     }
 
     public void response() throws SocketException {

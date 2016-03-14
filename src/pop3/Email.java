@@ -18,19 +18,22 @@ public class Email {
     private int id;
     private String expediteur;
     private ArrayList<String> destinataires;
+    private String objet;
     private String message;
 
-    public Email(String expediteur, ArrayList<String> destinataires, String message) {
+    public Email(String expediteur, ArrayList<String> destinataires, String objet, String message) {
         this.expediteur = expediteur;
         this.destinataires = destinataires;
+        this.objet = objet;
         this.message = message;
     }
 
-    public Email(String expediteur, String destinataires, String message) {
+    public Email(String expediteur, String destinataires, String objet, String message) {
         this.expediteur = expediteur;
         ArrayList<String> s = new ArrayList<>();
         s.add(destinataires);
         this.destinataires = s;
+        this.objet = objet;
         this.message = message;
     }
 
@@ -50,6 +53,14 @@ public class Email {
         this.destinataires = destinataires;
     }
 
+    public String getObjet() {
+        return objet;
+    }
+
+    public void setObjet(String objet) {
+        this.objet = objet;
+    }
+    
     public String getMessage() {
         return message;
     }
