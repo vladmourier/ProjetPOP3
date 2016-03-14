@@ -86,9 +86,4 @@ public class POP3ServerMessage {
     public Email getEmail() {
         return email;
     }
-
-    public void setEmail(Email email) {
-        this.email = email;
-    }
-    
 }
