@@ -33,20 +33,19 @@ public class Client {
     }
 
 private void initSocket() {
-        /*//initiation de dpEnvoi
-        dpEnvoi = null;
-        ObjetConnecte objConnect= new ObjetConnecte(ia, 110);
        try {
-            dsClient = new DatagramSocket();
-
-            //faire en sorte que l'utilisateur rentre lui mÃªme le message
-        } catch (SocketException ex) {
+           //initiation de dpEnvoi
+           ia = InetAddress.getByName("134.214.116.110");
+           ObjetConnecte objConnect= new ObjetConnecte(ia, 1024+110);
+           dsClient = new DatagramSocket(objConnect.getPort_c(),objConnect.getIa_c());         
+           buffer = "hi!".getBytes();
+           dpEnvoi = new DatagramPacket(buffer, buffer.length, objConnect.getIa_c(), objConnect.getPort_c());
+       } catch (SocketException ex) {
+               Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+               System.out.println("erreur DatagramSocket");
+       } catch (UnknownHostException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("erreur DatagramSocket");
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("erreur InetAddress");
-        }*/
+        }
     }
 
 public void envoiMsg(String msg){
@@ -54,34 +53,43 @@ public void envoiMsg(String msg){
             buffer = msg.getBytes();
             dpEnvoi = new DatagramPacket(buffer, buffer.length, ia, port);
             dsClient.send(this.dpEnvoi);
-            dsClient.receive(this.dpRecoit);
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
 }
 
-    private void run() {
+public String receiveMsg(){
+        try {
+            dsClient.receive(this.dpRecoit);
+            buffer = this.dpRecoit.getData();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return new String(buffer, StandardCharsets.UTF_8);
+}
+
+public static void main(String args[]) {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         try {
-            initSocket();
-            etat="initialisation";
-            System.out.println(etat);
-            dsClient.receive(dpRecoit);
-            String msg = new String(dpRecoit.getData(), StandardCharsets.UTF_8);
+            Client client = new Client();
+            client.initSocket();
+            client.etat="initialisation";
+            System.out.println(client.etat);
+            String msg = client.receiveMsg();
             if (!msg.contains("+OK")){
                 System.out.println("Erreur serveur");
                 return;
             }
-            
+            System.out.println(msg);
             System.out.println("Bienvenue, veuillez entrer votre nom d'utilisateur");
             String entree = br.readLine();
-            envoiMsg("USER "+entree);
-            etat="user envoyé";
+            client.envoiMsg("USER "+entree);
+            client.etat="user envoyé";
+
+
+
+            
         
-            
-            
-            
-            
             /* try {//envoi du datagram de connection au serveur RX302
             System.out.println("Connection au server RX302 ... ");
             buffer = "Hello server RX302 !".getBytes("ascii");
