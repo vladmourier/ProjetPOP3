@@ -18,37 +18,33 @@ import java.util.logging.Logger;
  *
  * @author Thibaud
  */
-public class Client {
+public class Client extends ObjetConnecte{
     
-    static DatagramSocket dsClient;
-    DatagramPacket dpEnvoi;
-    DatagramPacket dpRecoit;
-    byte[] buffer;
+    static Socket sServer;
     String dataServer;
     InetAddress ia;
-    String etat;
-    int port;
-    public Client() {
-        initSocket();
-    }
-
-private void initSocket() {
-       try {
-           //initiation de dpEnvoi
-           ia = InetAddress.getByName("134.214.116.110");
-           ObjetConnecte objConnect= new ObjetConnecte(ia, 1024+110);
-           dsClient = new DatagramSocket(objConnect.getPort_c(),objConnect.getIa_c());         
-           buffer = "hi!".getBytes();
-           dpEnvoi = new DatagramPacket(buffer, buffer.length, objConnect.getIa_c(), objConnect.getPort_c());
-       } catch (SocketException ex) {
-               Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-               System.out.println("erreur DatagramSocket");
-       } catch (UnknownHostException ex) {
+    int port_dest;
+    
+    public static final String ETAT_AUTORISATION = "autorisation";
+    public static final String ETAT_TRANSACTION = "transaction";
+    public static final String ETAT_USER_RECU = "user recu";
+    
+    public Client(String ip) throws SocketException {
+        super();
+        try {
+            port_dest = 1024 + 110;
+            ia = InetAddress.getByName(ip);
+            sServer = new Socket(ia, port_dest);
+            System.out.println("YAY!");
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-public void envoiMsg(String msg){
+
+/*public void envoiMsg(String msg){
         try {
             buffer = msg.getBytes();
             dpEnvoi = new DatagramPacket(buffer, buffer.length, ia, port);
@@ -67,29 +63,28 @@ public String receiveMsg(){
         }
         return new String(buffer, StandardCharsets.UTF_8);
 }
-
+*/
 public static void main(String args[]) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         try {
-            Client client = new Client();
-            client.initSocket();
-            client.etat="initialisation";
-            System.out.println(client.etat);
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            Client client = new Client("134.214.116.113");
+            System.out.println("test");
+            /*System.out.println(client.etat);
             String msg = client.receiveMsg();
             if (!msg.contains("+OK")){
-                System.out.println("Erreur serveur");
-                return;
+            System.out.println("Erreur serveur");
+            return;
             }
             System.out.println(msg);
             System.out.println("Bienvenue, veuillez entrer votre nom d'utilisateur");
             String entree = br.readLine();
             client.envoiMsg("USER "+entree);
             client.etat="user envoyé";
-
-
-
+            */
             
         
+            
+            
             /* try {//envoi du datagram de connection au serveur RX302
             System.out.println("Connection au server RX302 ... ");
             buffer = "Hello server RX302 !".getBytes("ascii");
@@ -125,10 +120,8 @@ public static void main(String args[]) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("erreur envoi datagram depuis le client");
             }*/
-        } catch (IOException ex) {
+        } catch (SocketException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
-            
-            
     }   
 }
