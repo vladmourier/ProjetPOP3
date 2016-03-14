@@ -78,17 +78,18 @@ public static void main(String args[]) {
             String msg = client.receiveMsg();
             if (!msg.contains("+OK")){
                 System.out.println("Erreur serveur");
+                return;
             }
             System.out.println(msg);
             System.out.println("Bienvenue, veuillez entrer votre nom d'utilisateur");
             String entree = br.readLine();
             client.envoiMsg("USER "+entree);
             client.etat="user envoyé";
+
+
+
+            
         
-            
-            
-            
-            
             /* try {//envoi du datagram de connection au serveur RX302
             System.out.println("Connection au server RX302 ... ");
             buffer = "Hello server RX302 !".getBytes("ascii");
