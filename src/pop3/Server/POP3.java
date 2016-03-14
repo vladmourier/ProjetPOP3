@@ -21,7 +21,7 @@ public class POP3 {
     public static void main(String[] args) {
         Serveur s;
         try {
-            s = new Serveur(110);
+            s = new Serveur(1024 + 110);
             s.run();
         } catch (IOException ex) {
             Logger.getLogger(POP3.class.getName()).log(Level.SEVERE, null, ex);

@@ -23,7 +23,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     public int port_ecoute;
     public InetAddress address_dest;
     private Socket Sclient;
-    
+        
     public static final String ETAT_AUTORISATION = "autorisation";
     public static final String ETAT_TRANSACTION = "transaction";
     public static final String ETAT_USER_RECU = "user recu";
@@ -38,8 +38,10 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     @Override
     public void run() {
+        System.out.println("ACCEPT OK");
         byte[] buffer = new byte[1024];
-        String currentState = " initialisation";
+        String currentState = "";
+        String received;
         try {
             this.OS = Sclient.getOutputStream();
             this.BOS = new BufferedOutputStream(this.OS);
@@ -47,9 +49,14 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.BIS = new BufferedInputStream(this.IS);
             POP3ServerMessage msg = new POP3ServerMessage(POP3ServerMessage.SERVER_READY, true);
             this.sendPop3ServerMessage(msg);
+            currentState = ETAT_AUTORISATION;
             switch(currentState){
                 case ETAT_AUTORISATION:
-                    
+                    BIS.read(buffer);
+                    received = new String(buffer);
+                    if(UserCommandIsValid(received)){
+                        System.out.println(received);
+                    }
                     break;
                 case ETAT_USER_RECU:
                     break;
@@ -92,5 +99,10 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     public POP3ServerMessage retrieveUserMessage(String userEmail, int i){
         return null;
+    }
+
+    private boolean UserCommandIsValid(String received) {
+        // Vérifier la validité de la commande user reçue
+        return true;
     }
 }
