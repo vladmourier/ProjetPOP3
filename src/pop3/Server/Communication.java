@@ -70,6 +70,8 @@ public class Communication extends ObjetConnecte implements Runnable {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        
+        
     }
     
     public int getPort_dest() {

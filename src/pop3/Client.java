@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class Client extends ObjetConnecte{
     
-    static Socket sServer;
+    static Socket sServer, socket;
     String dataServer;
     InetAddress ia;
     int port_dest;
@@ -48,6 +48,18 @@ public class Client extends ObjetConnecte{
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+        public Client(InetAddress ia, int port) throws SocketException, IOException {
+        super(ia, port);
+        this.socket = new Socket(ia, port);
+        this.port_c = this.socket.getLocalPort();
+        System.out.println("Socket cree port : " + port_c);
+        this.IS = this.socket.getInputStream();
+        this.BIS = new BufferedInputStream(this.IS);
+        this.OS = this.socket.getOutputStream();
+        this.BOS = new BufferedOutputStream(OS);
+
+    }
 
 
 public void envoiMsg(String msg){
@@ -71,7 +83,8 @@ public String msgClient(){
 public static void main(String args[]) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            Client client = new Client("134.214.116.113");
+            //Client client = new Client("localhost");
+            Client c = new Client(InetAddress.getByName("localhost"), 110);
             System.out.println("test");
             System.out.println(client.etat);
             String msg = client.receiveMsg();
@@ -125,6 +138,10 @@ public static void main(String args[]) {
             System.out.println("erreur envoi datagram depuis le client");
             }*/
         } catch (SocketException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }   
