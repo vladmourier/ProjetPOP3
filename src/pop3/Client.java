@@ -6,6 +6,8 @@
 
 package pop3;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,6 +38,10 @@ public class Client extends ObjetConnecte{
             ia = InetAddress.getByName(ip);
             sServer = new Socket(ia, port_dest);
             System.out.println("YAY!");
+            this.OS = sServer.getOutputStream();
+            this.BOS = new BufferedOutputStream(this.OS);
+            this.IS = sServer.getInputStream();
+            this.BIS = new BufferedInputStream(this.IS);
         } catch (UnknownHostException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -44,32 +50,30 @@ public class Client extends ObjetConnecte{
     }
 
 
-/*public void envoiMsg(String msg){
+public void envoiMsg(String msg){
         try {
-            buffer = msg.getBytes();
-            dpEnvoi = new DatagramPacket(buffer, buffer.length, ia, port);
-            dsClient.send(this.dpEnvoi);
+            this.BOS.write(msg.getBytes());
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
 }
 
 public String receiveMsg(){
-        try {
-            dsClient.receive(this.dpRecoit);
-            buffer = this.dpRecoit.getData();
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return new String(buffer, StandardCharsets.UTF_8);
+        byte[] buffer = new byte[1024];
+        this.BIS.read(buffer);
+        return new String(buffer);
 }
-*/
+
+public String msgClient(){
+    return null;
+}
+
 public static void main(String args[]) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             Client client = new Client("134.214.116.113");
             System.out.println("test");
-            /*System.out.println(client.etat);
+            System.out.println(client.etat);
             String msg = client.receiveMsg();
             if (!msg.contains("+OK")){
             System.out.println("Erreur serveur");
