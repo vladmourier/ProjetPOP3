@@ -10,6 +10,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +50,7 @@ public class Client extends ObjetConnecte{
         }
     }
     
-        public Client(InetAddress ia, int port) throws SocketException, IOException {
+    public Client(InetAddress ia, int port) throws SocketException, IOException {
         super(ia, port);
         this.socket = new Socket(ia, port);
         this.port_c = this.socket.getLocalPort();
@@ -58,46 +59,77 @@ public class Client extends ObjetConnecte{
         this.BIS = new BufferedInputStream(this.IS);
         this.OS = this.socket.getOutputStream();
         this.BOS = new BufferedOutputStream(OS);
-
+//        byte[] buffer = new byte[1024];
+//        this.BIS.read(buffer);
+//        String msg = new String(buffer);
+//        System.out.println(msg);
+        String msg = "test";
+        System.out.println(msg);
+        BOS.write(msg.getBytes());
+        BOS.flush();
     }
 
 
 public void envoiMsg(String msg){
         try {
             this.BOS.write(msg.getBytes());
+            this.BOS.flush();
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
 }
 
 public String receiveMsg(){
-        byte[] buffer = new byte[1024];
-        this.BIS.read(buffer);
-        return new String(buffer);
+        String msg = "Fail";
+        try {
+            int got;
+            byte[] buffer = new byte[1024];
+            while ((got = BIS.read(buffer)) != -1){
+                msg = 
+            }
+                
+            msg = new String(buffer);
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return msg;
 }
 
-public String msgClient(){
-    return null;
+
+public String getMsgClient(){
+        InputStream is = null;
+        BufferedReader br = null;
+        String line = null;
+        try {
+            is = System.in;
+            br = new BufferedReader(new InputStreamReader(is));
+            line = br.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return line;
 }
 
 public static void main(String args[]) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             //Client client = new Client("localhost");
-            Client c = new Client(InetAddress.getByName("localhost"), 110);
+            Client c = new Client(InetAddress.getByName("134.214.116.110"), 110);
             System.out.println("test");
-            System.out.println(client.etat);
-            String msg = client.receiveMsg();
+            String msg = c.receiveMsg();
+            System.out.println(c.ETAT_AUTORISATION);
             if (!msg.contains("+OK")){
-            System.out.println("Erreur serveur");
-            return;
+                System.out.println("Erreur serveur");
+                return;
             }
             System.out.println(msg);
             System.out.println("Bienvenue, veuillez entrer votre nom d'utilisateur");
-            String entree = br.readLine();
-            client.envoiMsg("USER "+entree);
-            client.etat="user envoyé";
-            */
+            String usr = c.getMsgClient();
+            System.out.println("Veuillez entrer votre mot de passe:");
+            String mdp = c.getMsgClient();
+            c.envoiMsg("APOP " + usr + " " + mdp);
+            System.out.println(c.ETAT_USER_RECU);
+            
             
         
             
