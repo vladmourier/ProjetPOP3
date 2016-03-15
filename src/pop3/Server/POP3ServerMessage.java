@@ -75,7 +75,10 @@ public class POP3ServerMessage {
     }
 
     public POP3ServerMessage(String message, boolean isOk) {
-        this.message = message;
+        switch(message){
+            case SERVER_READY:
+                this.message= "+OK POP3 SERVER READY";
+        }
         this.isOk = isOk;
     }
 
