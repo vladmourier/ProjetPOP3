@@ -1,0 +1,6 @@
+1
+MAIL FROM:<test>	
+RCPT TO:Adrien
+<OBJECT>TEST
+Corps du mail 3
+\r\n\r\n
