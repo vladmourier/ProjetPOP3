@@ -10,8 +10,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -84,7 +82,7 @@ public class Client extends ObjetConnecte{
                 return;
             }
             //faire lecture de la console et envoi des crédentials
-            c.envoiMsg("APOP user mdp");
+            c.envoiMsg("APOP User Pass");
             c.changementEtat(c.ETAT_APOPENVOYE);
             // Etat APOP envoyé ------------------------------------------------------
             s = c.receive();

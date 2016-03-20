@@ -134,14 +134,15 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
     private boolean ApopCommandIsValid(String received) {
         int userid;
-        String user, pass;
+        String user, pass, s;
         boolean okPass = false, okUser;
-        received = received.substring(4);
-        user = received.split(" ")[0];
-        pass = received.split(" ")[1];
+        s = received.substring(5);
+        user = s.split(" ")[0];
+        pass = s.split(" ")[1].split("\r\n")[0];
         okUser = UserCommandIsValid(received);
         try {
             userid = fileManager.findUser(user);
+            if(userid==0) return false;
             okPass = fileManager.verifyPass(userid, pass);
         } catch (IOException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
