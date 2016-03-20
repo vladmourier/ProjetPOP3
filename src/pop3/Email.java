@@ -21,14 +21,16 @@ public class Email {
     private String objet;
     private String message;
 
-    public Email(String expediteur, ArrayList<String> destinataires, String objet, String message) {
+    public Email(int id, String expediteur, ArrayList<String> destinataires, String objet, String message) {
+        this.id = id;
         this.expediteur = expediteur;
         this.destinataires = destinataires;
         this.objet = objet;
         this.message = message;
     }
 
-    public Email(String expediteur, String destinataires, String objet, String message) {
+    public Email(int id, String expediteur, String destinataires, String objet, String message) {
+        this.id = id;
         this.expediteur = expediteur;
         ArrayList<String> s = new ArrayList<>();
         s.add(destinataires);
