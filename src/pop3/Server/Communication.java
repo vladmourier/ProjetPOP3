@@ -56,8 +56,6 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.BIS = new BufferedInputStream(this.IS);
             POP3ServerMessage msg = new POP3ServerMessage(POP3ServerMessage.SERVER_READY, true);
             this.sendPop3ServerMessage(msg);
-            String s = this.receive();
-            System.out.println("J'ai reçu : " + s);
             currentState = ETAT_AUTORISATION;
             while(true && !quit_asked){
                 switch(currentState){
