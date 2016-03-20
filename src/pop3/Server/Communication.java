@@ -46,24 +46,26 @@ public class Communication extends ObjetConnecte implements Runnable {
         boolean quit_asked=false;
         try {
             this.OS = Sclient.getOutputStream();
-            //this.BOS = new BufferedOutputStream(this.OS);
+            this.BOS = new BufferedOutputStream(this.OS);
             this.IS = Sclient.getInputStream();
             this.BIS = new BufferedInputStream(this.IS);
             POP3ServerMessage msg = new POP3ServerMessage(POP3ServerMessage.SERVER_READY, true);
             this.sendPop3ServerMessage(msg);
+            String s = this.receive();
+            System.out.println("J'ai reçu : " + s);
             currentState = ETAT_AUTORISATION;
-            while(true && !quit_asked){
-                switch(currentState){
-                    case ETAT_AUTORISATION:
-                        quit_asked = manageAuthorizationState(received, buffer);
-                        break;
-                    case ETAT_USER_RECU:
-                        manageUserReceivedState(received, buffer);
-                        break;
-                    case ETAT_TRANSACTION:
-                        break;
-                }
-            }
+//            while(true && !quit_asked){
+//                switch(currentState){
+//                    case ETAT_AUTORISATION:
+//                        quit_asked = manageAuthorizationState(received, buffer);
+//                        break;
+//                    case ETAT_USER_RECU:
+//                        manageUserReceivedState(received, buffer);
+//                        break;
+//                    case ETAT_TRANSACTION:
+//                        break;
+//                }
+//            }
             
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -72,11 +74,12 @@ public class Communication extends ObjetConnecte implements Runnable {
         
     }
     
-    public boolean sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
+    public void sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
+        String s = m.getMessage() + "\r\n";
+        this.BOS.write(s.getBytes());
+        this.BOS.flush();
+        this.BOS.flush();
         System.out.println("J'envoie : " + m.getMessage());
-        this.OS.write(m.getMessage().getBytes());
-        this.OS.flush();
-        return true;
     }
     
     public POP3ServerMessage retrieveUserMessages(){

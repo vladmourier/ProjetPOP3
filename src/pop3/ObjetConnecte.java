@@ -14,6 +14,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -52,11 +54,18 @@ public class ObjetConnecte {
         this.MAX = 2000;
         
     }
-    public String receive() throws IOException{
-        byte[] buffer = new byte[10];
+    public String receive() {
+        byte[] buffer = new byte[1];
         String s = "";
-        while(BIS.read(buffer, 0, 10) != -1){
-            s += new String(buffer);
+        int ok;        try {
+        ok = BIS.read(buffer);
+
+            while(ok != -1){
+                s += new String(buffer);
+                ok = BIS.read(buffer);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ObjetConnecte.class.getName()).log(Level.SEVERE, null, ex);
         }
         return s;
     }
