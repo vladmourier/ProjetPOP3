@@ -53,10 +53,10 @@ public class ObjetConnecte {
         
     }
     public String receive() throws IOException{
-        byte[] buffer = new byte[1];
+        byte[] buffer = new byte[10];
         String s = "";
-        while(BIS.read(buffer) != -1){
-            s += buffer[0];
+        while(BIS.read(buffer, 0, 10) != -1){
+            s += new String(buffer);
         }
         return s;
     }

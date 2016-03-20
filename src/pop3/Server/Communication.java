@@ -40,13 +40,13 @@ public class Communication extends ObjetConnecte implements Runnable {
     @Override
     public void run() {
         System.out.println("ACCEPT OK");
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[256];
         currentState = "initialisation";
         String received = "";
         boolean quit_asked=false;
         try {
             this.OS = Sclient.getOutputStream();
-            this.BOS = new BufferedOutputStream(this.OS);
+            //this.BOS = new BufferedOutputStream(this.OS);
             this.IS = Sclient.getInputStream();
             this.BIS = new BufferedInputStream(this.IS);
             POP3ServerMessage msg = new POP3ServerMessage(POP3ServerMessage.SERVER_READY, true);
@@ -74,8 +74,8 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     public boolean sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
         System.out.println("J'envoie : " + m.getMessage());
-        this.BOS.write(m.getMessage().getBytes());
-        this.BOS.flush();
+        this.OS.write(m.getMessage().getBytes());
+        this.OS.flush();
         return true;
     }
     
@@ -156,7 +156,8 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     private boolean manageAuthorizationState(String received, byte[] buffer) throws IOException{
         System.out.println("Je lis");
-        received = this.receive();
+        this.BIS.read(buffer);
+        received = new String (buffer);
         System.out.println("J'ai reçu : " + received);
         if(received.startsWith("USER")){
             if(UserCommandIsValid(received)){

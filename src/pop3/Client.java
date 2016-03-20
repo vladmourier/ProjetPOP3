@@ -34,7 +34,7 @@ public class Client extends ObjetConnecte{
     public Client(String ip) throws SocketException {
         super();
         try {
-            port_dest = 1024 + 110;
+            port_dest = 110;
             ia = InetAddress.getByName(ip);
             sServer = new Socket(ia, port_dest);
             System.out.println("YAY!");
@@ -83,7 +83,8 @@ public static void main(String args[]) {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             //Client client = new Client("localhost");
             Client c = new Client(InetAddress.getByName("localhost"), 110);
-            System.out.println("test");
+            c.BOS.write("TEST".getBytes());
+            c.BOS.flush();
             /*System.out.println(client.etat);
             String msg = client.receiveMsg();
             if (!msg.contains("+OK")){
