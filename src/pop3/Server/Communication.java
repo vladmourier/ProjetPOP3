@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import pop3.Email;
 import pop3.ObjetConnecte;
 
 /**
@@ -79,25 +81,33 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
     
     public void sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
+        if(m.getMessage()==POP3ServerMessage.SERVER_INIT_MAILBOX){
+            /**
+             * TODO : Ajouter les infos sur les messages de l'utilisateur
+             */
+        }
         String s = m.getMessage() + "\r\n";
         this.BOS.write(s.getBytes());
-        this.BOS.flush();
         this.BOS.flush();
         System.out.println("J'envoie : " + m.getMessage());
     }
     
-    public POP3ServerMessage retrieveUserMessages(){
-        return null;
-        /**
-         * TODO
-         */
+    public ArrayList<Email> retrieveUserMessages(){
+        try {
+            return fileManager.getMails(currentUser.getId());
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
     
-    public POP3ServerMessage retrieveUserMessage(String userEmail, int i){
-        return null;
-        /**
-         * TODO
-         */
+    public Email retrieveUserMessage(int i){
+        try {
+            return fileManager.getMails(currentUser.getId()).get(i);
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
     
     public int getUserIdFromUsername(String username) throws IOException{
@@ -179,8 +189,11 @@ public class Communication extends ObjetConnecte implements Runnable {
         if(received.startsWith("PASS") && PassCommandIsValid(userid,received)){
             currentState = ETAT_TRANSACTION;
             /**
-             * TODO
+             * TODO : setter l'user courant si ce n'est pas déjà fait
              */
+            sendPop3ServerMessage(new POP3ServerMessage(
+                    POP3ServerMessage.SERVER_INIT_MAILBOX
+            ));
         } else {
             sendPop3ServerMessage(new POP3ServerMessage("-ERR PASSWORD IS INVALID"));
             currentState = ETAT_AUTORISATION;
@@ -206,8 +219,11 @@ public class Communication extends ObjetConnecte implements Runnable {
             if(ApopCommandIsValid(received)){
                 currentState = ETAT_TRANSACTION;
                 /**
-                 * TODO
+                 * TODO : mettre modifier l'user courant
                  */
+                sendPop3ServerMessage(new POP3ServerMessage(
+                        POP3ServerMessage.SERVER_INIT_MAILBOX
+                ));
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR APOP COMMAND IS NOT VALID OR THE REQUESTED CREDENTIALS WERE NOT CORRECT", false));
             }
