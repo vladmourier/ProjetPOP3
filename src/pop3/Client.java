@@ -6,6 +6,9 @@
 
 package pop3;
 
+import Etats.EtatApopEnvoye;
+import Etats.EtatInitialisation;
+import Etats.EtatTransaction;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -13,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import static java.lang.Integer.parseInt;
 import java.net.*;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -25,6 +29,7 @@ public class Client extends ObjetConnecte{
     String dataServer;
     InetAddress ia;
     int port_dest;
+    public boolean quit;
     
     String etatCourant;
     public static final String ETAT_INITIALISATION = "initialisation";
@@ -57,6 +62,7 @@ public class Client extends ObjetConnecte{
         this.BIS = new BufferedInputStream(this.IS);
         this.OS = this.socket.getOutputStream();
         this.BOS = new BufferedOutputStream(OS);
+        this.quit = false;
     }
     
     public void changementEtat(String etat){
@@ -65,9 +71,12 @@ public class Client extends ObjetConnecte{
     }
     
     public String lectureConsole(String action) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print(action);
-        String s = br.readLine();
+        System.out.println(action);
+        Scanner scanner = new Scanner(System.in);
+        String s = scanner.nextLine();
+        if(s.contains("quit") ||s.contains("Quit")){
+            quit = true;
+        }
         return s;
     }
     
@@ -77,38 +86,14 @@ public class Client extends ObjetConnecte{
         this.BOS.flush();
         this.BOS.flush();
         System.out.println("J'envoie : " + msg);
-    }
+    }  
+    
+    
     public static void main(String args[]) {
         try {
-            // Etat initialisation----------------------------------------------------
-            //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//            // Etat initialisation----------------------------------------------------
             Client c = new Client(InetAddress.getByName("localhost"), 110);
-            c.changementEtat(c.ETAT_INITIALISATION);
-            String s = c.receive();
-            System.out.println(s);
-            if (!s.contains("+OK POP3 SERVER READY")){
-                System.out.println("Authorisation refusee..\nFermeture de la session");//à gérer
-                return;
-            }
-            //faire lecture de la console et envoi des crédentials
-            String user = c.lectureConsole("Veuillez entrer votre nom d'utilisateur: ");
-            String mdp = c.lectureConsole("Veuillez entrer votre mot de passe: ");
-            c.envoiMsg("APOP " + user + " " + mdp);
-            c.changementEtat(c.ETAT_APOPENVOYE);
-            // Etat APOP envoyé ------------------------------------------------------
-            s = c.receive();
-            System.out.println(s);
-            if (!s.contains("+OK")){
-                System.out.println("Mauvais APOP..\nFermeture de la session");//à gérer
-                return;
-            }
-            //Etat transaction -------------------------------------------------------
-            c.changementEtat(c.ETAT_TRANSACTION);
-            System.out.println(s);
-            //gérer le dernier "s" pour récupérer le nombre de msgs
-            int nbMsg = parseInt(s.split(" ")[3]);
-            System.out.println("Vous avez " + nbMsg + " messages dans votre boite mail.");
-            String transaction = c.lectureConsole("Que voulez vous faire?\n 1 - Lire les messages?\n 2 - Supprimer les messages?\n 0 - Quitter?");
+            EtatInitialisation init = new EtatInitialisation(c);
             
             //gérer l'affichage des msg
             //gérer le quit
