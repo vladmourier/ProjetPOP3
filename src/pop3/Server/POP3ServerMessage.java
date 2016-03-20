@@ -5,7 +5,7 @@
  */
 package pop3.Server;
 
-import ClientPackage.Email;
+import pop3.Email;
 
 /**
  *
@@ -78,6 +78,10 @@ public class POP3ServerMessage {
         switch(message){
             case SERVER_READY:
                 this.message= "+OK POP3 SERVER READY";
+                break;
+            default:
+                this.message = message;
+                break;
         }
         this.isOk = isOk;
     }

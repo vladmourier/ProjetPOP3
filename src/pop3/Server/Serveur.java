@@ -27,7 +27,6 @@ public class Serveur{
        while (true) {
            try {
                 Socket Sclient = this.socketServer.accept();
-                System.out.println("TEST");
                 new Thread(new Communication(Sclient)).start();
                 //this.socketServer.close();         
             } catch (IOException ex) {

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import ClientPackage.ObjetConnecte;
+import pop3.ObjetConnecte;
 
 /**
  *
@@ -40,7 +40,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     @Override
     public void run() {
         System.out.println("ACCEPT OK");
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[256];
         currentState = "initialisation";
         String received = "";
         boolean quit_asked=false;
@@ -51,19 +51,21 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.BIS = new BufferedInputStream(this.IS);
             POP3ServerMessage msg = new POP3ServerMessage(POP3ServerMessage.SERVER_READY, true);
             this.sendPop3ServerMessage(msg);
+            String s = this.receive();
+            System.out.println("J'ai reçu : " + s);
             currentState = ETAT_AUTORISATION;
-            while(true && !quit_asked){
-                switch(currentState){
-                    case ETAT_AUTORISATION:
-                        quit_asked = manageAuthorizationState(received, buffer);
-                        break;
-                    case ETAT_USER_RECU:
-                        manageUserReceivedState(received, buffer);
-                        break;
-                    case ETAT_TRANSACTION:
-                        break;
-                }
-            }
+//            while(true && !quit_asked){
+//                switch(currentState){
+//                    case ETAT_AUTORISATION:
+//                        quit_asked = manageAuthorizationState(received, buffer);
+//                        break;
+//                    case ETAT_USER_RECU:
+//                        manageUserReceivedState(received, buffer);
+//                        break;
+//                    case ETAT_TRANSACTION:
+//                        break;
+//                }
+//            }
             
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -72,11 +74,12 @@ public class Communication extends ObjetConnecte implements Runnable {
         
     }
     
-    public boolean sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
-        System.out.println("J'envoie : " + m.getMessage());
-        this.BOS.write(m.getMessage().getBytes());
+    public void sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
+        String s = m.getMessage() + "\r\n";
+        this.BOS.write(s.getBytes());
         this.BOS.flush();
-        return true;
+        this.BOS.flush();
+        System.out.println("J'envoie : " + m.getMessage());
     }
     
     public POP3ServerMessage retrieveUserMessages(){
@@ -156,7 +159,8 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     private boolean manageAuthorizationState(String received, byte[] buffer) throws IOException{
         System.out.println("Je lis");
-        received = this.receive();
+        this.BIS.read(buffer);
+        received = new String (buffer);
         System.out.println("J'ai reçu : " + received);
         if(received.startsWith("USER")){
             if(UserCommandIsValid(received)){

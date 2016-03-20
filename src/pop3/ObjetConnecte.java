@@ -3,7 +3,7 @@
 * To change this template file, choose Tools | Templates
 * and open the template in the editor.
 */
-package ClientPackage;
+package pop3;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -14,6 +14,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -52,15 +54,25 @@ public class ObjetConnecte {
         this.MAX = 2000;
         
     }
-    public String receive() throws IOException{
-        byte[] buffer = new byte[1024];
-        byte[] chunk = new byte[1];
-//        String s = "";
-        int got;
-        while((got = BIS.read(chunk)) != -1){
-            buffer[got] = chunk[0];
+    public String receive() {
+        byte[] buffer = new byte[1];
+        String s = "";
+        int ok;        try {
+            ok = BIS.read(buffer);
+            
+            while(ok != -1){
+                s += new String(buffer);
+                if(s.endsWith("\r\n")){
+                    ok = -1;
+                }else {
+                    ok = BIS.read(buffer);
+                    
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ObjetConnecte.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new String(buffer);
+        return s;
     }
     public ArrayList<Integer> ScannerUDP(ArrayList<Integer> plage) {
         ArrayList<Integer> retour = new ArrayList<Integer>();
