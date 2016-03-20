@@ -58,11 +58,16 @@ public class ObjetConnecte {
         byte[] buffer = new byte[1];
         String s = "";
         int ok;        try {
-        ok = BIS.read(buffer);
-
+            ok = BIS.read(buffer);
+            
             while(ok != -1){
                 s += new String(buffer);
-                ok = BIS.read(buffer);
+                if(s.endsWith("\r\n")){
+                    ok = -1;
+                }else {
+                    ok = BIS.read(buffer);
+                    
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(ObjetConnecte.class.getName()).log(Level.SEVERE, null, ex);
