@@ -8,9 +8,7 @@ package pop3;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
@@ -27,9 +25,13 @@ public class Client extends ObjetConnecte{
     InetAddress ia;
     int port_dest;
     
-    public static final String ETAT_AUTORISATION = "autorisation";
+    String etatCourant;
+    public static final String ETAT_INITIALISATION = "initialisation";
+    public static final String ETAT_APOPENVOYE = "apop envoye";
     public static final String ETAT_TRANSACTION = "transaction";
-    public static final String ETAT_USER_RECU = "user recu";
+    public static final String ETAT_SUPPRESSION = "suppression";
+    public static final String ETAT_ATTENTEQUIT = "attente du quit";
+    
     
     public Client(String ip) throws SocketException {
         super();
@@ -54,93 +56,49 @@ public class Client extends ObjetConnecte{
         this.BIS = new BufferedInputStream(this.IS);
         this.OS = this.socket.getOutputStream();
         this.BOS = new BufferedOutputStream(OS);
-        
+    }
+    
+    public void changementEtat(String etat){
+        etatCourant = etat;
+        System.out.println(" ---- Etat courant: " + etatCourant + "\n");
     }
     
     
-    /*public void envoiMsg(String msg){
-    try {
-    buffer = msg.getBytes();
-    dpEnvoi = new DatagramPacket(buffer, buffer.length, ia, port);
-    dsClient.send(this.dpEnvoi);
-    } catch (IOException ex) {
-    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+    public void envoiMsg(String msg) throws IOException{
+        String s = msg + "\r\n";
+        this.BOS.write(s.getBytes());
+        this.BOS.flush();
+        this.BOS.flush();
+        System.out.println("J'envoie : " + msg);
     }
-    }
-    
-    public String receiveMsg(){
-    try {
-    dsClient.receive(this.dpRecoit);
-    buffer = this.dpRecoit.getData();
-    } catch (IOException ex) {
-    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    return new String(buffer, StandardCharsets.UTF_8);
-    }
-    */
     public static void main(String args[]) {
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            //Client client = new Client("localhost");
+            // Etat initialisation----------------------------------------------------
+            //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             Client c = new Client(InetAddress.getByName("localhost"), 110);
+            c.changementEtat(c.ETAT_INITIALISATION);
             String s = c.receive();
             System.out.println(s);
-            //System.out.println(c.receive());
-            /*System.out.println(client.etat);
-            String msg = client.receiveMsg();
-            if (!msg.contains("+OK")){
-            System.out.println("Erreur serveur");
-            return;
+            if (!s.contains("+OK POP3 SERVER READY")){
+                System.out.println("Authorisation refusee..\nFermeture de la session");//à gérer
+                return;
             }
-            System.out.println(msg);
-            System.out.println("Bienvenue, veuillez entrer votre nom d'utilisateur");
-            String entree = br.readLine();
-            client.envoiMsg("USER "+entree);
-            client.etat="user envoyé";
-            */
-            
-            
-            
-            
-            /* try {//envoi du datagram de connection au serveur RX302
-            System.out.println("Connection au server RX302 ... ");
-            buffer = "Hello server RX302 !".getBytes("ascii");
-            dpEnvoi = new DatagramPacket(buffer, buffer.length, ia, ObjetConnecte.port_c);
-            dsClient.send(dpEnvoi);
-            
-            //Reception du message de bienvenue du server
-            dsClient.receive(dpRecoit);
-            dataServer = new String(dpRecoit.getData(), "ascii");
-            port = dpEnvoi.getPort();
-            System.out.println(dataServer + " - @IP : " + port);
-            
-            //Envoi pepere du datagram
-            boolean run = true;
-            System.out.println("Saisissez Close pour mettre fin Ã  la connexion");
-            while (run) {
-            buffer = new byte[ObjetConnecte.MAX];
-            System.out.println("quel est le message Ã  envoyer?");
-            Scanner sc = new Scanner(System.in);
-            buffer = sc.nextLine().getBytes("ascii");
-            String strCheck = new String(buffer, "ascii");
-            dpEnvoi = new DatagramPacket(buffer, buffer.length, ia, port);
-            if ("Close".equals(strCheck)) {
-            dsClient.send(dpEnvoi);
-            run = false;
-            } else if(buffer.length==0){
-            System.out.println("Message vide !");
-            } else {
-            dsClient.send(dpEnvoi);
+            //faire lecture de la console et envoi des crédentials
+            c.envoiMsg("APOP user mdp");
+            c.changementEtat(c.ETAT_APOPENVOYE);
+            // Etat APOP envoyé ------------------------------------------------------
+            s = c.receive();
+            System.out.println(s);
+            if (!s.contains("+OK")){
+                System.out.println("Mauvais APOP..\nFermeture de la session");//à gérer
+                return;
             }
-            }
-            } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("erreur envoi datagram depuis le client");
-            }*/
-        } catch (SocketException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            //gérer le dernier "s" pour récupérer le nombre de msgs
+            //gérer l'affichage des msg
+            //gérer le quit
+            //faire une fonction pour chaque états?
+            //
+            
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
