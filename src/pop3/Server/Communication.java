@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import pop3.ObjetConnecte;
 
 /**
@@ -23,7 +25,8 @@ public class Communication extends ObjetConnecte implements Runnable {
     public int port_ecoute;
     public InetAddress address_dest;
     private Socket Sclient;
-    
+    private FileManager fileManager;
+    private User currentUser;
     private String currentState;
     public static final String ETAT_AUTORISATION = "autorisation";
     public static final String ETAT_TRANSACTION = "transaction";
@@ -34,6 +37,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         port_dest = client.getPort();
         this.Sclient = client;
         this.address_dest = client.getInetAddress();
+        fileManager = new FileManager();
         System.out.println("Communication creee avec le Client : " + address_dest + " | " + port_dest);
     }
     
@@ -41,7 +45,6 @@ public class Communication extends ObjetConnecte implements Runnable {
     public void run() {
         System.out.println("ACCEPT OK");
         byte[] buffer = new byte[256];
-        currentState = "initialisation";
         String received = "";
         boolean quit_asked=false;
         try {
@@ -54,18 +57,19 @@ public class Communication extends ObjetConnecte implements Runnable {
             String s = this.receive();
             System.out.println("J'ai reçu : " + s);
             currentState = ETAT_AUTORISATION;
-//            while(true && !quit_asked){
-//                switch(currentState){
-//                    case ETAT_AUTORISATION:
-//                        quit_asked = manageAuthorizationState(received, buffer);
-//                        break;
-//                    case ETAT_USER_RECU:
-//                        manageUserReceivedState(received, buffer);
-//                        break;
-//                    case ETAT_TRANSACTION:
-//                        break;
-//                }
-//            }
+            while(true && !quit_asked){
+                switch(currentState){
+                    case ETAT_AUTORISATION:
+                        quit_asked = manageAuthorizationState(received, buffer);
+                        break;
+                    case ETAT_USER_RECU:
+                        manageUserReceivedState(currentUser.getId(),received, buffer);
+                        break;
+                    case ETAT_TRANSACTION:
+                        quit_asked = manageTransactionState(received, buffer);
+                        break;
+                }
+            }
             
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -96,19 +100,45 @@ public class Communication extends ObjetConnecte implements Runnable {
          */
     }
     
-    private boolean UserCommandIsValid(String received) {
-        // Vérifier la validité de la commande user reçue
-        /**
-         * TODO
-         */
-        return true;
+    public int getUserIdFromUsername(String username) throws IOException{
+        return fileManager.findUser(username);
     }
     
+    private boolean UserCommandIsValid(String received) {
+        // Vérifier la validité de la commande user reçue
+        String username;
+        username = received.split(" ")[1];
+        try {
+            return fileManager.findUser(username) != 0;
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    private boolean PassCommandIsValid(int userid, String received) {
+        String pass = received.split(" ")[1];
+        try {
+            return   fileManager.verifyPass(userid, pass);
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
     private boolean ApopCommandIsValid(String received) {
-        /**
-         * TODO
-         */
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int userid;
+        String user, pass;
+        boolean okPass = false, okUser;
+        received = received.substring(4);
+        user = received.split(" ")[0];
+        pass = received.split(" ")[1];
+        okUser = UserCommandIsValid(received);
+        try {
+            userid = fileManager.findUser(user);
+            okPass = fileManager.verifyPass(userid, pass);
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return okPass && okUser;
     }
     
     private boolean RetrieveCommandIsValid(String s ){
@@ -142,11 +172,11 @@ public class Communication extends ObjetConnecte implements Runnable {
         return false;
     }
     
-    private void manageUserReceivedState(String received, byte[] buffer) throws IOException{
+    private void manageUserReceivedState(int userid, String received, byte[] buffer) throws IOException{
         BIS.read(buffer);
         received = new String(buffer);
         System.out.println("J'ai reçu : " + received);
-        if(received.startsWith("PASS")){
+        if(received.startsWith("PASS") && PassCommandIsValid(userid,received)){
             currentState = ETAT_TRANSACTION;
             /**
              * TODO
@@ -166,9 +196,9 @@ public class Communication extends ObjetConnecte implements Runnable {
             if(UserCommandIsValid(received)){
                 System.out.println(received);
                 currentState = ETAT_USER_RECU;
-                /**
-                 * TODO
-                 */
+                sendPop3ServerMessage(new POP3ServerMessage(
+                        POP3ServerMessage.SERVER_WAITING_FOR_PASS
+                ));
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR USER COMMAND IS NOT VALID OR THE REQUESTED USER WAS NOT FOUND", false));
             }
@@ -183,10 +213,9 @@ public class Communication extends ObjetConnecte implements Runnable {
             }
             
         } else if (received.startsWith("QUIT")){
-            /**
-             * TODO
-             */
-            //sendPop3ServerMessage(new POP3ServerMessage());
+            sendPop3ServerMessage(new POP3ServerMessage(
+                    POP3ServerMessage.SERVER_SIGNING_OFF
+            ));
             return true;
         } else {
             sendPop3ServerMessage(new POP3ServerMessage("-ERR INVALID COMMAND", false));
