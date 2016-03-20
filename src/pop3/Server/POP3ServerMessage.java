@@ -5,7 +5,7 @@
  */
 package pop3.Server;
 
-import pop3.Email;
+import ClientPackage.Email;
 
 /**
  *

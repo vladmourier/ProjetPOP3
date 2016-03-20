@@ -8,7 +8,7 @@ package pop3.Server;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import pop3.Email;
+import ClientPackage.Email;
 
 /**
  *
