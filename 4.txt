@@ -3,4 +3,9 @@ MAIL FROM:<test>
 RCPT TO:Alpha
 <OBJECT>TEST
 Corps du mail 4
+1
+MAIL FROM:<test>
+RCPT TO:Alpha
+<OBJECT>TEST
+Corps du mail 4
 \r\n\r\n

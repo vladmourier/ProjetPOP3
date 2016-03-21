@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pop3.Email;
 import pop3.ObjetConnecte;
 
 /**
@@ -23,7 +27,8 @@ public class Communication extends ObjetConnecte implements Runnable {
     public int port_ecoute;
     public InetAddress address_dest;
     private Socket Sclient;
-    
+    private FileManager fileManager;
+    private User currentUser;
     private String currentState;
     public static final String ETAT_AUTORISATION = "autorisation";
     public static final String ETAT_TRANSACTION = "transaction";
@@ -34,14 +39,14 @@ public class Communication extends ObjetConnecte implements Runnable {
         port_dest = client.getPort();
         this.Sclient = client;
         this.address_dest = client.getInetAddress();
+        fileManager = new FileManager();
         System.out.println("Communication creee avec le Client : " + address_dest + " | " + port_dest);
     }
     
     @Override
     public void run() {
         System.out.println("ACCEPT OK");
-        byte[] buffer = new byte[1024];
-        currentState = "initialisation";
+        byte[] buffer = new byte[256];
         String received = "";
         boolean quit_asked=false;
         try {
@@ -58,9 +63,10 @@ public class Communication extends ObjetConnecte implements Runnable {
                         quit_asked = manageAuthorizationState(received, buffer);
                         break;
                     case ETAT_USER_RECU:
-                        manageUserReceivedState(received, buffer);
+                        manageUserReceivedState(currentUser.getId(),received, buffer);
                         break;
                     case ETAT_TRANSACTION:
+                        quit_asked = manageTransactionState(received, buffer);
                         break;
                 }
             }
@@ -72,40 +78,76 @@ public class Communication extends ObjetConnecte implements Runnable {
         
     }
     
-    public boolean sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
-        System.out.println("J'envoie : " + m.getMessage());
-        this.BOS.write(m.getMessage().getBytes());
+    public void sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
+        if(m.getMessage()==POP3ServerMessage.SERVER_INIT_MAILBOX){
+            /**
+             * TODO : Ajouter les infos sur les messages de l'utilisateur
+             */
+        }
+        String s = m.getMessage() + "\r\n";
+        this.BOS.write(s.getBytes());
         this.BOS.flush();
-        return true;
+        System.out.println("J'envoie : " + m.getMessage());
     }
     
-    public POP3ServerMessage retrieveUserMessages(){
-        return null;
-        /**
-         * TODO
-         */
+    public ArrayList<Email> retrieveUserMessages(){
+        try {
+            return fileManager.getMails(currentUser.getId());
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
     
-    public POP3ServerMessage retrieveUserMessage(String userEmail, int i){
-        return null;
-        /**
-         * TODO
-         */
+    public Email retrieveUserMessage(int i){
+        try {
+            return fileManager.getMails(currentUser.getId()).get(i);
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    public int getUserIdFromUsername(String username) throws IOException{
+        return fileManager.findUser(username);
     }
     
     private boolean UserCommandIsValid(String received) {
         // Vérifier la validité de la commande user reçue
-        /**
-         * TODO
-         */
-        return true;
+        String username;
+        username = received.split(" ")[1];
+        try {
+            return fileManager.findUser(username) != 0;
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
-    
+    private boolean PassCommandIsValid(int userid, String received) {
+        String pass = received.split(" ")[1];
+        try {
+            return   fileManager.verifyPass(userid, pass);
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
     private boolean ApopCommandIsValid(String received) {
-        /**
-         * TODO
-         */
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int userid;
+        String user, pass, s;
+        boolean okPass = false, okUser;
+        s = received.substring(5);
+        user = s.split(" ")[0];
+        pass = s.split(" ")[1].split("\r\n")[0];
+        okUser = UserCommandIsValid(received);
+        try {
+            userid = fileManager.findUser(user);
+            if(userid==0) return false;
+            okPass = fileManager.verifyPass(userid, pass);
+        } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return okPass && okUser;
     }
     
     private boolean RetrieveCommandIsValid(String s ){
@@ -139,15 +181,18 @@ public class Communication extends ObjetConnecte implements Runnable {
         return false;
     }
     
-    private void manageUserReceivedState(String received, byte[] buffer) throws IOException{
+    private void manageUserReceivedState(int userid, String received, byte[] buffer) throws IOException{
         BIS.read(buffer);
         received = new String(buffer);
         System.out.println("J'ai reçu : " + received);
-        if(received.startsWith("PASS")){
+        if(received.startsWith("PASS") && PassCommandIsValid(userid,received)){
             currentState = ETAT_TRANSACTION;
             /**
-             * TODO
+             * TODO : setter l'user courant si ce n'est pas déjà fait
              */
+            sendPop3ServerMessage(new POP3ServerMessage(
+                    POP3ServerMessage.SERVER_INIT_MAILBOX
+            ));
         } else {
             sendPop3ServerMessage(new POP3ServerMessage("-ERR PASSWORD IS INVALID"));
             currentState = ETAT_AUTORISATION;
@@ -156,15 +201,16 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     private boolean manageAuthorizationState(String received, byte[] buffer) throws IOException{
         System.out.println("Je lis");
-        received = this.receive();
+        this.BIS.read(buffer);
+        received = new String (buffer);
         System.out.println("J'ai reçu : " + received);
         if(received.startsWith("USER")){
             if(UserCommandIsValid(received)){
                 System.out.println(received);
                 currentState = ETAT_USER_RECU;
-                /**
-                 * TODO
-                 */
+                sendPop3ServerMessage(new POP3ServerMessage(
+                        POP3ServerMessage.SERVER_WAITING_FOR_PASS
+                ));
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR USER COMMAND IS NOT VALID OR THE REQUESTED USER WAS NOT FOUND", false));
             }
@@ -172,17 +218,19 @@ public class Communication extends ObjetConnecte implements Runnable {
             if(ApopCommandIsValid(received)){
                 currentState = ETAT_TRANSACTION;
                 /**
-                 * TODO
+                 * TODO : mettre modifier l'user courant
                  */
+                sendPop3ServerMessage(new POP3ServerMessage(
+                        POP3ServerMessage.SERVER_INIT_MAILBOX
+                ));
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR APOP COMMAND IS NOT VALID OR THE REQUESTED CREDENTIALS WERE NOT CORRECT", false));
             }
             
         } else if (received.startsWith("QUIT")){
-            /**
-             * TODO
-             */
-            //sendPop3ServerMessage(new POP3ServerMessage());
+            sendPop3ServerMessage(new POP3ServerMessage(
+                    POP3ServerMessage.SERVER_SIGNING_OFF
+            ));
             return true;
         } else {
             sendPop3ServerMessage(new POP3ServerMessage("-ERR INVALID COMMAND", false));
