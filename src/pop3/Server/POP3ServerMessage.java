@@ -19,7 +19,7 @@ public class POP3ServerMessage {
     ///
     /// Constantes identifiant les messages que le serveur doit envoyer
     ///
-    public static final String SERVER_READY = "+OK POP3 SERVER READY\nCoucou !";
+    public static final String SERVER_READY = "+OK POP3 SERVER READY";
     public static final String SERVER_SIGNING_OFF = "+OK SERVER SIGNING OFF";
     public static final String SERVER_WAITING_FOR_PASS = "+OK POP3 SERVER WAITING FOR PASS";
     public static final String SERVER_INIT_MAILBOX = "+OK MAILBOX INITIALIZED";

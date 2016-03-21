@@ -209,7 +209,7 @@ public class Communication extends ObjetConnecte implements Runnable {
              * TODO : setter l'user courant si ce n'est pas déjà fait
              */
             POP3ServerMessage m = new POP3ServerMessage();
-            sendPop3ServerMessage(m.getMsgServerInitMailbox(fileManager.getMails(currentUser.getId()).size(), fileManager.getMailsSize(currentUser.getId())));
+            sendPop3ServerMessage(m.getMsgServerInitMailbox(fileManager.getMails(currentUser.getId()).size(),(int) fileManager.getMailsSize(currentUser.getId())));
         } else {
             sendPop3ServerMessage(new POP3ServerMessage("-ERR PASSWORD IS INVALID"));
             currentState = ETAT_AUTORISATION;
