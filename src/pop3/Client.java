@@ -6,7 +6,6 @@
 
 package pop3;
 
-import Etats.EtatApopEnvoye;
 import Etats.EtatInitialisation;
 import Etats.EtatTransaction;
 import java.io.BufferedInputStream;
@@ -33,7 +32,6 @@ public class Client extends ObjetConnecte{
     
     String etatCourant;
     public static final String ETAT_INITIALISATION = "initialisation";
-    public static final String ETAT_APOPENVOYE = "apop envoye";
     public static final String ETAT_TRANSACTION = "transaction";
     public static final String ETAT_SUPPRESSION = "suppression";
     public static final String ETAT_ATTENTEQUIT = "attente du quit";
@@ -94,11 +92,6 @@ public class Client extends ObjetConnecte{
 //            // Etat initialisation----------------------------------------------------
             Client c = new Client(InetAddress.getByName("localhost"), 110);
             EtatInitialisation init = new EtatInitialisation(c);
-            
-            //gérer l'affichage des msg
-            //gérer le quit
-            //faire une fonction pour chaque états?
-            //
             
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);

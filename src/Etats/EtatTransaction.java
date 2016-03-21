@@ -9,6 +9,8 @@ import java.io.IOException;
 import static java.lang.Integer.parseInt;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import pop3.Client;
 
 /**
@@ -26,6 +28,11 @@ public class EtatTransaction {
         client = c;
         this.nbMsg = nbMsg;
         scanner = new Scanner(System.in);
+        try {
+            run();
+        } catch (IOException ex) {
+            Logger.getLogger(EtatTransaction.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void run() throws IOException {
@@ -42,14 +49,15 @@ public class EtatTransaction {
                 int res = scanner.nextInt();
                 if (res == 1) {
                     System.out.println("Quel message voulez vous lire?");
-                    queFaire = scanner.nextLine();
-                    client.envoiMsg("RETR " + queFaire);
+                    int lire = scanner.nextInt();
+                    client.envoiMsg("RETR " + lire);
                 } else if (res == 2) {
-                    System.out.println("Quel message voulez vous lire?");
-                    queFaire = scanner.nextLine();
-                    client.envoiMsg("DEL " + queFaire);
+                    System.out.println("Quel message voulez vous supprimer?");
+                    int suppr = scanner.nextInt();
+                    client.envoiMsg("DEL " + suppr);
                 } else if (res == 0) {
                     quit = true;
+                    break;
                 }
             } catch (NoSuchElementException e) {
                 System.out.println("Error: " + e.getMessage());

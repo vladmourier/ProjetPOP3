@@ -15,7 +15,7 @@ import pop3.Client;
 public class EtatQuit {
 
     public EtatQuit(Client c) throws IOException {
-        System.out.println(" ---- QUIT ----");
+        c.changementEtat(c.ETAT_ATTENTEQUIT);
         c.envoiMsg("QUIT");
     }
     
