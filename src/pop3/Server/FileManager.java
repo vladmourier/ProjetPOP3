@@ -73,6 +73,11 @@ public class FileManager {
         return ok;
     }
     
+    public long getMailsSize(int idu){
+        File f = new File(idu+".txt");
+        return f.length();
+    }
+    
     public ArrayList<Email> getMails(int idu) throws IOException {
         ArrayList<Email> mailList = new ArrayList();
 
@@ -126,7 +131,7 @@ public class FileManager {
     }
     
     public boolean deleteMail(int idu, int idm) {
-        boolean suppr = false;
+        boolean dele = false;
         
         try {
             //Fichier temporaire, on recopir toutes les lignes sauf le mail à delete
@@ -156,7 +161,7 @@ public class FileManager {
                     newMail = false;
                     if (Integer.parseInt(line) == idm) {
                         goodMail = false;
-                        suppr = true;
+                        dele = true;
                         //System.out.println("detection mauvais mail à ne pas copier");
                     } else {
                         goodMail = true;
@@ -197,7 +202,18 @@ public class FileManager {
             Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return suppr;
+        return dele;
     }
-    
+    /*
+    public boolean writeMail(int idu, Email mail)
+    {
+        boolean wri = false;
+        
+        try{
+            
+        }
+        
+        return wri;
+    }
+    */
 }
