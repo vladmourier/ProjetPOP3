@@ -79,7 +79,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
     
     public void sendPop3ServerMessage(POP3ServerMessage m) throws IOException{
-        if(m.getMessage()==POP3ServerMessage.SERVER_INIT_MAILBOX){
+        if(m.getMessage().equals(POP3ServerMessage.SERVER_INIT_MAILBOX)){
             /**
              * TODO : Ajouter les infos sur les messages de l'utilisateur
              */
@@ -151,10 +151,28 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
     
     private boolean RetrieveCommandIsValid(String s ){
+        if(s.startsWith("RETR")){
+            try {
+                if(fileManager.getMails(currentUser.getId()).size() >= Integer.parseInt(s.split(" ")[1])){
+                    return true;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return false;
     }
     
     private boolean DeleteCommandIsValid(String s){
+        if(s.startsWith("DELE")){
+            try {
+                if(fileManager.getMails(currentUser.getId()).size() >= Integer.parseInt(s.split(" ")[1])){
+                    return true;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return false;
     }
     
@@ -190,9 +208,8 @@ public class Communication extends ObjetConnecte implements Runnable {
             /**
              * TODO : setter l'user courant si ce n'est pas déjà fait
              */
-            sendPop3ServerMessage(new POP3ServerMessage(
-                    POP3ServerMessage.SERVER_INIT_MAILBOX
-            ));
+            POP3ServerMessage m = new POP3ServerMessage();
+            sendPop3ServerMessage(m.getMsgServerInitMailbox(fileManager.getMails(currentUser.getId()).size(), fileManager.getMailsSize(currentUser.getId())));
         } else {
             sendPop3ServerMessage(new POP3ServerMessage("-ERR PASSWORD IS INVALID"));
             currentState = ETAT_AUTORISATION;
