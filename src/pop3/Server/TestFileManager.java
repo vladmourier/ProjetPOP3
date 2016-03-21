@@ -25,7 +25,7 @@ public class TestFileManager {
             System.out.println("Le pass est : "+FM.verifyPass(3, "motdepasse"));
             System.out.println("Le pass est : "+FM.verifyPass(3, "test"));
             FM.getMails(1);
-            FM.deleteMail(1, 1);
+            System.out.println(FM.deleteMail(1, 1));
             
         } catch (IOException ex) {
             Logger.getLogger(TestFileManager.class.getName()).log(Level.SEVERE, null, ex);

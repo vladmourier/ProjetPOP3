@@ -54,7 +54,7 @@ public class ObjetConnecte {
         this.MAX = 2000;
         
     }
-    public String receive() {
+    public String receive(String condition) {
         byte[] buffer = new byte[1];
         String s = "";
         int ok;        try {
@@ -62,7 +62,7 @@ public class ObjetConnecte {
             
             while(ok != -1){
                 s += new String(buffer);
-                if(s.endsWith("\r\n")){
+                if(s.endsWith(condition)){
                     ok = -1;
                 }else {
                     ok = BIS.read(buffer);

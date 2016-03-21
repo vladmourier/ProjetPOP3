@@ -5,31 +5,15 @@
 */
 package pop3.Server;
 
-import pop3.Email;
-
 /**
  *
  * @author Vladimir
  */
-public class POP3ServerMessage {
-    /**
-     * The email address of the logged user
-     */
-    public String address;
-    /**
-     * L'email concerné par le message du serveur
-     * ex : le mail concerné par un retrieve
-     */
-    public Email email;
-    
+public class POP3ServerMessage { 
     /**
      * Le corps du message server ; Doit commencer par +OK ou -ERR
      */
     public String message;
-    /**
-     * Booléen indiquant si l'action du client a pu etre effectuée
-     */
-    public boolean isOk;
     
     
     ///
@@ -42,20 +26,23 @@ public class POP3ServerMessage {
     public static final String SERVER_SEND_INFOS = "sending infos";
     public static final String SERVER_DELETING_MESSAGE = "deleting message";
     
+    public POP3ServerMessage(){
+        this.message = "";
+    }
+    
     public POP3ServerMessage getMsgServerReady(){
         this.message = "+OK POP3 server ready";
-        this.isOk = true;
         return this;
     }
     
     public POP3ServerMessage getMsgServerSigningOff(){
         this.message = "+OK POP3 server signing off";
-        this.isOk = true;
         return this;
     }
     
-    public POP3ServerMessage getMsgServerInitMailbox(){
-        return null;
+    public POP3ServerMessage getMsgServerInitMailbox(int b, int size){
+        this.message = "+OK MAILBOX HAS " + b + " MESSAGES (" + size +" bytes)";
+        return this;
     }
     
     public String getMessage() {
@@ -66,24 +53,11 @@ public class POP3ServerMessage {
         this.message = message;
     }
     
-    public boolean isIsOk() {
-        return isOk;
-    }
-    
-    public void setIsOk(boolean isOk) {
-        this.isOk = isOk;
-    }
-    
     public POP3ServerMessage(String message, boolean isOk) {
         this.message = message;
-        this.isOk = isOk;
     }
     
     public POP3ServerMessage(String message) {
         this.message = message;
-    }
-    
-    public Email getEmail() {
-        return email;
     }
 }
