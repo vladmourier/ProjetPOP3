@@ -90,7 +90,8 @@ public class Client extends ObjetConnecte{
     public static void main(String args[]) {
         try {
 //            // Etat initialisation----------------------------------------------------
-            Client c = new Client(InetAddress.getByName("localhost"), 110);
+            //Client c = new Client(InetAddress.getByName("localhost"), 110);
+            Client c = new Client(InetAddress.getByName("134.214.118.6"), 110);
             EtatInitialisation init = new EtatInitialisation(c);
             
         } catch (IOException ex) {
