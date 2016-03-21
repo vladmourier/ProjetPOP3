@@ -181,15 +181,19 @@ public class Communication extends ObjetConnecte implements Runnable {
         received = new String(buffer);
         if(received.startsWith("RETR")){
             if(RetrieveCommandIsValid(received)){
-                
+                /**
+                 * TODO
+                 */
             } else {
-                
+                /**
+                 * TODO
+                 */
             }
         } else if (received.startsWith("DELE")){
             if(DeleteCommandIsValid(received)){
-                
+                fileManager.deleteMail(currentUser.getId(), Integer.parseInt(received.split(" ")[1]));
             } else {
-                
+                sendPop3ServerMessage(new POP3ServerMessage("-ERR A PROBLEM OCCURED DURING DELETION"));
             }
         } else if (received.startsWith("QUIT")){
             
