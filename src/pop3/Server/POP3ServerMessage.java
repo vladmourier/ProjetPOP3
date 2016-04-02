@@ -42,14 +42,13 @@ public class POP3ServerMessage {
         for(Email m : mails){
             message += mails.indexOf(m)+1 + " " + 10 + "\r\n";
         }
-        message += ".";
         return this;
     }
     
     public POP3ServerMessage getMsgShowingEmail(Email e){
-//        this.message = "+OK " + e.getSize() + " bytes \r\n";
-//        message += e.
-        return null;
+        this.message = "+OK " + e.getSize() + " bytes \r\n";
+        message += e.getFullText();
+        return this;
     }
     
     public String getMessage() {
