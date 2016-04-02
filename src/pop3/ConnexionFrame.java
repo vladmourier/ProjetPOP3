@@ -211,10 +211,10 @@ public class ConnexionFrame extends javax.swing.JFrame {
                 String reponse = c.receive("\r\n");
                 this.outputField.setText(reponse + "\n" + this.outputField.getText());
                 if (reponse.contains("+OK")){
-                    JOptionPane.showMessageDialog(null, "Connection réussie\nBienvenu, " + this.getUserTxt());
-                    this.dispose();
+                    JOptionPane.showMessageDialog(null, "Connection réussie\nBienvenue, " + this.getUserTxt());
                     int nbMsg = parseInt(reponse.split(" ")[4]);
-                    MailFrame mailFrame = new MailFrame();
+                    this.setVisible(false);
+                    MailFrame mailFrame = new MailFrame(3, user, c);//nbMsg
                     mailFrame.setVisible(true);
                 }
                 else {
@@ -230,7 +230,7 @@ public class ConnexionFrame extends javax.swing.JFrame {
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         try {
            this.getServerTxt();
-           if (InetAddress.getByName(this.server).isReachable(1000) && !"".equals(this.server)){
+           if (!"".equals(this.server)){
                 c = new Client(InetAddress.getByName(this.server), 110);
                 JOptionPane.showMessageDialog(null, "Serveur atteint");
                 this.outputField.setText(c.receive("\r\n") + this.outputField.getText());
