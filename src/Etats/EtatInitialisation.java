@@ -8,6 +8,7 @@ package Etats;
 import java.io.IOException;
 import static java.lang.Integer.parseInt;
 import pop3.Client;
+import pop3.ConnexionFrame;
 
 /**
  *
@@ -16,19 +17,17 @@ import pop3.Client;
 public class EtatInitialisation {
 
     Client client;
-    int nbMsg;
+    ConnexionFrame fenetre;
 
     public EtatInitialisation(Client c) throws IOException {
         client = c;
-        nbMsg = 0;
-        run();
     }
 
-    public void run() throws IOException {
+    public void connection(String user, String mdp) throws IOException {
         client.changementEtat(client.ETAT_INITIALISATION);
-        String s = client.receive();
+        String s = client.receive("\r\n");
         System.out.println(s);
-        if (!s.contains("+OK POP3 SERVER READY")) {
+        if (!s.contains("+OK")) {
             System.out.println("Connexion au serveur échouée..\nFermeture de la session.");//à gérer
             return;
         }
@@ -36,16 +35,8 @@ public class EtatInitialisation {
         int test = 0; //jusqu'a 5 essais
         boolean passed = false;
         while (test < 5 && !passed) {
-            String user = client.lectureConsole("Veuillez entrer votre nom d'utilisateur: ");
-            if (client.quit) {
-                EtatQuit quit = new EtatQuit(client);
-            }
-            String mdp = client.lectureConsole("Veuillez entrer votre mot de passe: ");
-            if (client.quit) {
-                EtatQuit quit = new EtatQuit(client);
-            }
             client.envoiMsg("APOP " + user + " " + mdp);
-            s = client.receive();
+            s = client.receive("\r\n");
             System.out.println(s);
             if (s.contains("+OK")){
                 passed = true;
@@ -60,7 +51,7 @@ public class EtatInitialisation {
             }
             test++;
         }
-        //nbMsg = parseInt(s.split(" ")[3]);
+        int nbMsg = parseInt(s.split(" ")[4]);
         EtatTransaction transac = new EtatTransaction(client, nbMsg);
     }
 

@@ -53,7 +53,7 @@ public class EtatTransaction {
                     int lire = scanner.nextInt();
                     if (lire != 0){
                         client.envoiMsg("RETR " + lire);
-                        String reponse = client.receive();
+                        String reponse = client.receiveMail();
                         System.out.println(reponse);
                     }
                 } else if (res == 2) {
@@ -61,7 +61,7 @@ public class EtatTransaction {
                     int suppr = scanner.nextInt();
                     if (suppr != 0){
                         client.envoiMsg("DEL " + suppr);
-                        String reponse = client.receive();
+                        String reponse = client.receive("\r\n");
                         System.out.println(reponse);
                     }
                 } else if (res == 0) {
