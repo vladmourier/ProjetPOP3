@@ -82,7 +82,7 @@ public class Email {
         int size = "MAIL FROM:<>".getBytes().length
                 + "RCPT TO:".getBytes().length
                 + "<OBJECT>".getBytes().length
-                + "\r\n\r\n".getBytes().length
+                + "\\r\\n\\r\\n".getBytes().length
                 + this.expediteur.getBytes().length
                 + this.message.getBytes().length
                 + this.objet.getBytes().length;

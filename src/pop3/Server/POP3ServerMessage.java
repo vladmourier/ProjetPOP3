@@ -47,7 +47,7 @@ public class POP3ServerMessage {
     
     public POP3ServerMessage getMsgShowingEmail(Email e){
         this.message = "+OK " + e.getSize() + " bytes \r\n";
-        message += e.getFullText();
+        message += e.getFullText() + ".";
         return this;
     }
     
