@@ -29,6 +29,8 @@ public class Communication extends ObjetConnecte implements Runnable {
     private Socket Sclient;
     private FileManager fileManager;
     private User currentUser;
+    private ArrayList<Email> currentMails;
+    private ArrayList<Integer> markedAsDeleted;
     private String currentState;
     public static final String ETAT_AUTORISATION = "autorisation";
     public static final String ETAT_TRANSACTION = "transaction";
@@ -40,6 +42,8 @@ public class Communication extends ObjetConnecte implements Runnable {
         this.Sclient = client;
         this.address_dest = client.getInetAddress();
         fileManager = new FileManager();
+        currentMails = new ArrayList<>();
+        markedAsDeleted = new ArrayList<>();
         System.out.println("Communication creee avec le Client : " + address_dest + " | " + port_dest);
     }
     
@@ -94,7 +98,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
     
     public int getUserIdFromUsername(String username) throws IOException{
-        return fileManager.findUser(username);
+        return fileManager.findUserId(username);
     }
     
     private boolean UserCommandIsValid(String received) {
@@ -102,7 +106,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         String username;
         username = received.split(" ")[1];
         try {
-            return fileManager.findUser(username) != 0;
+            return fileManager.findUserId(username) != 0;
         } catch (IOException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -126,11 +130,12 @@ public class Communication extends ObjetConnecte implements Runnable {
         pass = s.split(" ")[1].split("\r\n")[0];
         okUser = UserCommandIsValid(received);
         try {
-            userid = fileManager.findUser(user);
+            userid = fileManager.findUserId(user);
             if(userid==0) return false;
             okPass = fileManager.verifyPass(userid, pass);
             if(okPass && okUser){
                 currentUser = new User(userid, user, pass);
+                currentMails = retrieveUserMessages();
             }
         } catch (IOException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
@@ -140,7 +145,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     private boolean RetrieveCommandIsValid(String s ){
         if(s.startsWith("RETR")){
-            int nb = fileManager.getMails(currentUser.getId()).size();
+            int nb = currentMails.size();
             String sub = s.split(" ")[1];
             int target = Integer.parseInt(sub.split("\r\n")[0]);
             if(nb >= target){
@@ -152,7 +157,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     private boolean DeleteCommandIsValid(String s){
         if(s.startsWith("DELE")){
-            if(fileManager.getMails(currentUser.getId()).size() >= Integer.parseInt(s.split(" ")[1])){
+            if(currentMails.size() >= Integer.parseInt(s.split(" ")[1])){
                 return true;
             }
         }
@@ -195,9 +200,8 @@ public class Communication extends ObjetConnecte implements Runnable {
         System.out.println("J'ai reçu : " + received);
         if(received.startsWith("PASS") && PassCommandIsValid(userid,received)){
             currentState = ETAT_TRANSACTION;
-            /**
-             * TODO : setter l'user courant si ce n'est pas déjà fait
-             */
+            currentUser = fileManager.retrieveUser(userid);
+            currentMails = fileManager.getMails(currentUser.getId());
             POP3ServerMessage m = new POP3ServerMessage();
             sendPop3ServerMessage(m.getMsgServerInitMailbox(fileManager.getMails(currentUser.getId()),(int) fileManager.getMailsSize(currentUser.getId())));
         } else {
@@ -230,8 +234,8 @@ public class Communication extends ObjetConnecte implements Runnable {
                 String userid = received.split(" ")[1];
                 POP3ServerMessage m = new POP3ServerMessage();
                 sendPop3ServerMessage(m.getMsgServerInitMailbox(
-                        fileManager.getMails(currentUser == null ? fileManager.findUser(userid) : currentUser.getId()),
-                        (int) fileManager.getMailsSize(currentUser == null ? fileManager.findUser(userid) : currentUser.getId()))
+                        fileManager.getMails(currentUser == null ? fileManager.findUserId(userid) : currentUser.getId()),
+                        (int) fileManager.getMailsSize(currentUser == null ? fileManager.findUserId(userid) : currentUser.getId()))
                 );
                 
             } else {

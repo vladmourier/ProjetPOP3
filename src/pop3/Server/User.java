@@ -14,11 +14,8 @@ public class User {
     private String username;
     private String pass;
 
-    public static User retrieveUserbyUsername(String name){
-        /**
-         * TODO
-         */
-        return new User(1,"","");
+    public User(){
+        
     }
     
     public User(int id, String username, String pass) {

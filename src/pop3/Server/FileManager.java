@@ -19,7 +19,7 @@ public class FileManager {
     
     final String user_pass = "User_Pass.txt";
     
-    public int findUser(String usr) throws IOException {
+    public int findUserId(String usr) throws IOException {
         int id = 0;
         
         try {
@@ -42,6 +42,64 @@ public class FileManager {
         }
         
         return id;
+    }
+    
+    public User retrieveUser(String usr){
+        User u = new User();
+        
+        try {
+            InputStream ips = new FileInputStream(user_pass);
+            InputStreamReader ipsr = new InputStreamReader(ips);
+            BufferedReader br = new BufferedReader(ipsr);
+            String line;
+            
+            while ((line = br.readLine()) != null) {
+                //System.out.println(line);
+                //il faut parser line entre chaque tabulation pour tester
+                String[] user = line.split("\t");
+                if (usr.equals(user[0])) {
+                    u.setId(Integer.parseInt(user[2]));
+                    u.setUsername(user[0]);
+                    u.setPass(user[1]);
+                    break;
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return u;
+    }
+    
+        public User retrieveUser(int usr){
+        User u = new User();
+        
+        try {
+            InputStream ips = new FileInputStream(user_pass);
+            InputStreamReader ipsr = new InputStreamReader(ips);
+            BufferedReader br = new BufferedReader(ipsr);
+            String line;
+            
+            while ((line = br.readLine()) != null) {
+                //System.out.println(line);
+                //il faut parser line entre chaque tabulation pour tester
+                String[] user = line.split("\t");
+                if (Integer.parseInt(user[2]) == usr) {
+                    u.setId(Integer.parseInt(user[2]));
+                    u.setUsername(user[0]);
+                    u.setPass(user[1]);
+                    break;
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return u;
     }
     
     public boolean verifyPass(int id, String pass) throws IOException {
@@ -105,23 +163,23 @@ public class FileManager {
                     lineId = 0;
                     body = "";
                 } else
-                if(line.startsWith("MAIL FROM:")){
-                    String exp = line.split(":")[1];
-                    exp= exp.substring(1, exp.length()-1);
-                    mail.setExpediteur(exp);
-                } else
-                if(line.startsWith("RCPT TO:")){
-                    for(String s : line.split(":")[1].split(",")){
-                        mail.addDestinataire(s);
-                    }
-                } else
-                if(line.startsWith("<OBJECT>")){
-                    mail.setObjet(line.substring("<OBJECT>".length()));
-                } else if (lineId==0) {
-                    mail.setId(Integer.parseInt(line));
-                } else {
-                    body += line;
-                }
+                    if(line.startsWith("MAIL FROM:")){
+                        String exp = line.split(":")[1];
+                        exp= exp.substring(1, exp.length()-1);
+                        mail.setExpediteur(exp);
+                    } else
+                        if(line.startsWith("RCPT TO:")){
+                            for(String s : line.split(":")[1].split(",")){
+                                mail.addDestinataire(s);
+                            }
+                        } else
+                            if(line.startsWith("<OBJECT>")){
+                                mail.setObjet(line.substring("<OBJECT>".length()));
+                            } else if (lineId==0) {
+                                mail.setId(Integer.parseInt(line));
+                            } else {
+                                body += line;
+                            }
                 lineId++;
             }
         } catch (FileNotFoundException ex) {
