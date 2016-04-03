@@ -177,7 +177,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             }
         } else if (received.startsWith("DELE")){
             if(DeleteCommandIsValid(received)){
-                fileManager.deleteMail(currentUser.getId(), Integer.parseInt(received.split(" ")[1]));
+                markedAsDeleted.add(Integer.parseInt(received.split(" ")[1]));
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR A PROBLEM OCCURED DURING DELETION"));
             }
@@ -240,9 +240,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         } else if (received.startsWith("APOP")){
             if(ApopCommandIsValid(received)){
                 currentState = ETAT_TRANSACTION;
-                /**
-                 * TODO : mettre modifier l'user courant
-                 */
+
                 String userid = received.split(" ")[1];
                 POP3ServerMessage m = new POP3ServerMessage();
                 sendPop3ServerMessage(m.getMsgServerInitMailbox(
