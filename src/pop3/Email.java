@@ -21,7 +21,9 @@ public class Email {
     private ArrayList<String> destinataires;
     private String objet;
     private String message;
-
+    public Email (){
+        destinataires = new ArrayList<>();
+    }
     public Email(int id, String expediteur, ArrayList<String> destinataires, String objet, String message) {
         this.id = id;
         this.expediteur = expediteur;
@@ -65,7 +67,9 @@ public class Email {
     public ArrayList<String> getDestinataires() {
         return destinataires;
     }
-
+    public void addDestinataire(String destinataire){
+        destinataires.add(destinataire);
+    }
     public void setDestinataires(ArrayList<String> destinataires) {
         this.destinataires = destinataires;
     }
@@ -110,5 +114,19 @@ public class Email {
     public void setId(int id) {
         this.id = id;
     }
-    
+       public String getFullText(){
+        String dest = "";
+        for(String s : destinataires){
+            dest += s;
+            if(destinataires.indexOf(s) != destinataires.size()-1){
+                dest += ",";
+            }
+        }
+        String s = "MAIL FROM: <" + expediteur + "> \r\n"
+                +   "RCPT TO:" + dest + "\r\n"
+                +   "<OBJECT>" + objet + "\r\n"
+                +   this.message
+                + "\r\n";
+        return s;
+    }
 }
