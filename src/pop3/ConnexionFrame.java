@@ -96,11 +96,14 @@ public class ConnexionFrame extends javax.swing.JFrame {
 
         jLabel3.setText("Mot de passe:");
 
+        userField.setText("User");
         userField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 userFieldActionPerformed(evt);
             }
         });
+
+        mdpField.setText("Pass");
 
         connectButton.setText("Connect");
         connectButton.setEnabled(false);
@@ -109,6 +112,8 @@ public class ConnexionFrame extends javax.swing.JFrame {
                 connectButtonActionPerformed(evt);
             }
         });
+
+        serverField.setText("localhost");
 
         jLabel4.setText("Adresse Serveur:");
 

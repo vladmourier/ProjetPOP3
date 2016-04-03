@@ -21,6 +21,10 @@ public class Email {
     private String objet;
     private String message;
     
+    public Email(){
+        destinataires = new ArrayList<>();
+    }
+    
     public Email(int id, String expediteur, ArrayList<String> destinataires, String objet, String message) {
         this.id = id;
         this.expediteur = expediteur;
@@ -54,7 +58,9 @@ public class Email {
     public void setDestinataires(ArrayList<String> destinataires) {
         this.destinataires = destinataires;
     }
-    
+    public void addDestinataire(String dest){
+        this.destinataires.add(dest);
+    }
     public String getObjet() {
         return objet;
     }
@@ -84,6 +90,14 @@ public class Email {
             size += s.getBytes().length;
         }
         return size;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
     
     
