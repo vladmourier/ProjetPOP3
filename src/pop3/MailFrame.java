@@ -187,6 +187,7 @@ public class MailFrame extends javax.swing.JFrame {
     private void quitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitButtonActionPerformed
         try {
             c.envoiMsg("QUIT");
+            c.receive("\r\n");
             JOptionPane.showMessageDialog(null, "A bientot!");
             //TROUVER COMMENT SUPPRIMER LE THREAD 
         } catch (IOException ex) {
@@ -196,7 +197,13 @@ public class MailFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_quitButtonActionPerformed
 
     private void supprimerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supprimerButtonActionPerformed
-
+        try {
+            c.envoiMsg("DELE " + 2);
+            c.receive("\r\n");
+        } catch (IOException ex) {
+            Logger.getLogger(MailFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_supprimerButtonActionPerformed
 
     /**

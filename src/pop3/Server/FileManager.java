@@ -73,7 +73,7 @@ public class FileManager {
         return u;
     }
     
-        public User retrieveUser(int usr){
+    public User retrieveUser(int usr){
         User u = new User();
         
         try {
@@ -191,7 +191,63 @@ public class FileManager {
         return mailList;
     }
     
-    public boolean deleteMail(int idu, int idm) {
+    public boolean deleteMail(int idu, int idm){
+        boolean deleted = false;
+        File f = new File(idu + ".txt");
+        File fTemp = new File(idu + "-.txt");
+        try {
+            fTemp.createNewFile();
+            InputStream ips = new FileInputStream(f);
+            System.out.println("Ouverture de : " + idu + ".txt");
+            InputStreamReader ipsr = new InputStreamReader(ips);
+            BufferedReader br = new BufferedReader(ipsr);
+            int lineId=0, current_mail_id = 0;
+            String line;
+            OutputStream ops = new FileOutputStream(fTemp);
+            OutputStreamWriter opsw = new OutputStreamWriter(ops);
+            while((line= br.readLine()) != null){
+                if(lineId == 0){
+                    current_mail_id = Integer.parseInt(line);
+                    lineId++;
+                }
+                if (current_mail_id != idm){
+                    opsw.write(line + "\r\n");
+                    opsw.flush();
+                    lineId++;
+                }
+                if(line.equals("\\r\\n\\r\\n")){
+                    lineId = 0;
+                }
+            }
+            br.close();
+            br = null;
+            ipsr.close();
+            ipsr = null;
+            ips.close();
+            ips = null;
+            opsw.close();
+            opsw = null;
+            ops.close();
+            ops = null;
+            //on peut supprimer le fichier inital et renommer le fichier temporaire
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.gc();
+        f.setWritable(true);
+        System.out.println(f.delete());
+        return fTemp.renameTo(f);
+    }
+    
+    /**
+     * ------------- NOT WORKING ----------
+     * @param idu
+     * @param idm
+     * @return 
+     */
+    public boolean deleteMail2(int idu, int idm) {
         boolean dele = false;
         
         try {

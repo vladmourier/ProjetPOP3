@@ -157,7 +157,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     private boolean DeleteCommandIsValid(String s){
         if(s.startsWith("DELE")){
-            if(currentMails.size() >= Integer.parseInt(s.split(" ")[1])){
+            if(currentMails.size() >= Integer.parseInt(s.split(" ")[1].split("\r\n")[0])){
                 return true;
             }
         }
@@ -167,6 +167,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     private boolean manageTransactionState(String received, byte[] buffer) throws IOException{
         BIS.read(buffer);
         received = new String(buffer);
+        System.out.println(received);
         if(received.startsWith("RETR")){
             if(RetrieveCommandIsValid(received)){
                 System.out.println("OK");
@@ -177,16 +178,11 @@ public class Communication extends ObjetConnecte implements Runnable {
             }
         } else if (received.startsWith("DELE")){
             if(DeleteCommandIsValid(received)){
-                markedAsDeleted.add(Integer.parseInt(received.split(" ")[1]));
+                markedAsDeleted.add(Integer.parseInt(received.split(" ")[1].split("\r\n")[0]));
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR A PROBLEM OCCURED DURING DELETION"));
             }
         } else if (received.startsWith("QUIT")){
-            /**
-             * TODO : traiter les mails marqués comme supprimés
-             *          Si il y a des erreurs, on envoie -ERR au client
-             *          Sinon on envoie +OK Server Signing off
-             */
             boolean deleted;
             ArrayList<Integer> notDeleted = new ArrayList<>();
             for(int id : markedAsDeleted){
