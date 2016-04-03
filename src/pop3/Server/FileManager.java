@@ -75,6 +75,8 @@ public class FileManager {
     
     public long getMailsSize(int idu){
         File f = new File(idu+".txt");
+        //TODO
+        //Enlever les numéros de messages et les retour à la ligne pour resultat exact
         return f.length();
     }
     
@@ -92,12 +94,12 @@ public class FileManager {
             int i = 0;
             
             while ((line = br.readLine()) != null) {
-                //System.out.println(line);
+                System.out.println(line);
                 //il faut récupérer bloc par bloc pour générer les mails proprement
                 bloc.add(line);
                 i++;
-                if (line.equals("\\r\\n\\r\\n")) {
-                    //System.out.println("New Mail");
+                if (line.equals(".")) {
+                    System.out.println("New Mail");
                     int idm = Integer.parseInt(bloc.get(0));
                     //commencer à lire à partir du char n°10, jusqu'à la fin
                     String sender = bloc.get(1).substring(10, bloc.get(1).length());
@@ -110,9 +112,11 @@ public class FileManager {
                     //commencer à lire à partir du char n°8 jusqu'à la fin
                     String object = bloc.get(3).substring(8, bloc.get(3).length());
                     //Récupération du corps du mail
-                    String mail = null;
+                    String mail = new String();
+                    
+                    
                     for (int c = 4; c > bloc.size(); c++) {
-                        mail.concat(bloc.get(c));
+                        mail += bloc.get(c);
                     }
                     Email mailTemp = new Email(idu, sender, rcpt, object, mail);
                     mailList.add(mailTemp); //fin traitement du mail, on passe au suivant
@@ -177,7 +181,7 @@ public class FileManager {
                 }
 
                 //Si on atteint une fin de mail, on le signale pour la prochaine lecture
-                if (line.equals("\\r\\n\\r\\n")) {
+                if (line.equals(".")) {
                     newMail = true;
                 }
             }

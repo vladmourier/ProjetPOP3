@@ -1,0 +1,14 @@
+1
+MAIL FROM:<test>	
+RCPT TO:Toto
+<OBJECT>TEST
+
+Corps du mail 1, user 2
+.
+2
+MAIL FROM:<test>	
+RCPT TO:Toto
+<OBJECT>TEST
+
+Corps du mail 2, user 2
+.

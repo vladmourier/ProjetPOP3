@@ -71,5 +71,23 @@ public class Email {
         this.message = message;
     }
     
+    public int getSize(){
+        int res = 0;
+        res += this.expediteur.length()+10;
+        System.out.println("taille exp = " + (this.expediteur.length()+10) + "   " + res);
+        res += this.objet.length()+8;
+        System.out.println("taille obj = " + (this.objet.length()+8) + "   " + res);
+        res += 7;
+        System.out.println("taille obj = " + 7 + "   " + res);
+        for (String s: this.destinataires){
+            res += s.length();
+            System.out.println("Taille dest = " + s.length() + "   " + res);
+            res += 1;
+        }
+        res += this.message.length();
+        System.out.println("Taille message = " + this.message.length() + "   " + res);
+        
+        return res;
+    }
     
 }
