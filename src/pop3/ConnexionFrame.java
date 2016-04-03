@@ -214,11 +214,11 @@ public class ConnexionFrame extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Connection réussie\nBienvenue, " + this.getUserTxt());
                     int nbMsg = parseInt(reponse.split(" ")[4]);
                     this.setVisible(false);
-                    MailFrame mailFrame = new MailFrame(3, user, c);//nbMsg
+                    MailFrame mailFrame = new MailFrame(nbMsg, user, c);//nbMsg
                     mailFrame.setVisible(true);
                 }
                 else {
-                    this.outputField.setText("Mot de passe erroné" + "\n" + this.outputField.getText());
+                    this.outputField.setText("Mot de passe erroné" + this.outputField.getText());
                 }
             }
             

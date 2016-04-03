@@ -2,8 +2,7 @@
 * To change this license header, choose License Headers in Project Properties.
 * To change this template file, choose Tools | Templates
 * and open the template in the editor.
-*/
-
+ */
 package pop3;
 
 import Etats.EtatInitialisation;
@@ -19,25 +18,25 @@ import java.net.*;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
  * @author Thibaud
  */
-public class Client extends ObjetConnecte{
-    
+public class Client extends ObjetConnecte {
+
     static Socket sServer, socket;
     String dataServer;
     InetAddress ia;
     int port_dest;
     public boolean quit;
-    
+
     String etatCourant;
     public static final String ETAT_INITIALISATION = "initialisation";
     public static final String ETAT_TRANSACTION = "transaction";
     public static final String ETAT_SUPPRESSION = "suppression";
     public static final String ETAT_ATTENTEQUIT = "attente du quit";
-    
-    
+
     public Client(String ip) throws SocketException {
         super();
         try {
@@ -51,7 +50,7 @@ public class Client extends ObjetConnecte{
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public Client(InetAddress ia, int port) throws SocketException, IOException {
         super(ia, port);
         this.socket = new Socket(ia, port);
@@ -63,52 +62,81 @@ public class Client extends ObjetConnecte{
         this.BOS = new BufferedOutputStream(OS);
         this.quit = false;
     }
-    
-    public void changementEtat(String etat){
+
+    public void changementEtat(String etat) {
         etatCourant = etat;
         System.out.println(" ---- Etat courant: " + etatCourant + "\n");
     }
-    
-    public String lectureConsole(String action) throws IOException{
+
+    public String lectureConsole(String action) throws IOException {
         System.out.println(action);
         Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine();
-        if(s.contains("quit") ||s.contains("Quit")){
+        if (s.contains("quit") || s.contains("Quit")) {
             quit = true;
         }
         return s;
     }
-    
-    public String receiveMail(){
-        String mail = receive("\r\n.\r\n");
-        if (mail.startsWith("+OK")){
-            mail = mail.substring(4, mail.length() - 2); //enlève le +OK et le . de la fin
+
+    public String receiveMail() {
+        byte[] buffer = new byte[1];
+        String s = "";
+        int ok;
+        try {
+            ok = BIS.read(buffer);
+            s = new String(buffer);//premiere ligne
+            if (s.contains("+OK")) { //on vérifie si c'est un mail ou une erreur
+                while (ok != -1) {
+                    s += new String(buffer);
+                    if (s.endsWith("\r\n.\r\n")) {
+                        ok = -1;
+                    } else {
+                        ok = BIS.read(buffer);
+                    }
+                }
+            } else {
+                if (s.endsWith("\r\n")) {
+                    ok = -1;
+                } else {
+                    ok = BIS.read(buffer);
+                }
+                while (ok != -1) {
+                    s += new String(buffer);
+                    if (s.endsWith("\r\n")) {
+                        ok = -1;
+                    } else {
+                        ok = BIS.read(buffer);
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ObjetConnecte.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return mail;
+
+        return s;
     }
-    
-    public void envoiMsg(String msg) throws IOException{
+
+    public void envoiMsg(String msg) throws IOException {
         String s = msg + "\r\n";
         this.BOS.write(s.getBytes());
         this.BOS.flush();
         //this.BOS.flush();
         System.out.println("J'envoie : " + msg);
-    }  
-    
-    
+    }
+
     public static void main(String args[]) {
         try {
 //            // Etat initialisation----------------------------------------------------
             //Client c = new Client(InetAddress.getByName("localhost"), 110);
             ConnexionFrame f = new ConnexionFrame();
             f.setVisible(true);
-            while (f.server==""){
+            while (f.server == "") {
                 //sleep(0);
             }
             //Client c = new Client(InetAddress.getByName("134.214.118.6"), 110);
             Client c = new Client(InetAddress.getByName(f.getServerTxt()), 110);
             EtatInitialisation init = new EtatInitialisation(c);
-            
+
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }

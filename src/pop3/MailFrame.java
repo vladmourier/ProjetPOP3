@@ -6,20 +6,22 @@
 package pop3;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author mathieu
  */
 public class MailFrame extends javax.swing.JFrame {
-    
-    int[] listMail;//list des mails, listMail[i] = 0 -> mail i non supprimé
-                   //                listMail[i] = 1 -> mail i supprimé
+
+    ArrayList<Email> listMail;//list des mails, listMail[i] = 0 -> mail i non supprimé
+    //                listMail[i] = 1 -> mail i supprimé
     Client c;
+
     /**
      * Creates new form MailFrame
      */
@@ -27,12 +29,27 @@ public class MailFrame extends javax.swing.JFrame {
         c = client;
         initComponents();
         this.bienvenueLabel.setText(this.bienvenueLabel.getText() + user);
-        listMail = new int[nbMail];
+        listMail = new ArrayList<>();
         this.listMailView.clearSelection();
         DefaultListModel listModel = new DefaultListModel();
-        for(int i=1; i<= nbMail; i++){
-            String mail = "Mail " + i;
-            listModel.addElement(mail);
+        for (int i = 1; i <= nbMail; i++) {
+            try {
+                c.envoiMsg("RETR " + i);//on récupère le mail
+                String test = c.receiveMail();
+                if (test.contains("+OK")) {
+                    Email mail = new Email(test, i);
+                    listMail.add(mail);// on le stock localement
+                    c.envoiMsg("DEL " + i);//on le supprime du server
+                    c.receive("\r\n");
+                    listModel.addElement(mail.getObjet());
+                }
+                else {
+                    this.outputField.setText(test + this.outputField.getText());
+                    listModel.addElement("!!ERROR");
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(MailFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         this.listMailView.setModel(listModel);
         this.supprimerButton.setEnabled(false);
@@ -55,6 +72,8 @@ public class MailFrame extends javax.swing.JFrame {
         listMailView = new javax.swing.JList<>();
         supprimerButton = new javax.swing.JButton();
         quitButton = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        outputField = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -93,18 +112,23 @@ public class MailFrame extends javax.swing.JFrame {
             }
         });
 
+        outputField.setColumns(20);
+        outputField.setRows(5);
+        jScrollPane2.setViewportView(outputField);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(21, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(listPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 338, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(21, 21, 21)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(listPane, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(quitButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(supprimerButton)))
+                        .addComponent(supprimerButton))
+                    .addComponent(jScrollPane2))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
@@ -124,14 +148,15 @@ public class MailFrame extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(listPane, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(supprimerButton)
                             .addComponent(quitButton))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -139,34 +164,39 @@ public class MailFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void listMailViewMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listMailViewMouseClicked
-        if (evt.getClickCount() >=1){
+        if (evt.getClickCount() >= 1) {
             this.supprimerButton.setEnabled(true);
         }
-        if (evt.getClickCount()==2){
+        if (evt.getClickCount() == 2) {
             try {
                 int index = this.listMailView.locationToIndex(evt.getPoint()) + 1;
                 this.c.envoiMsg("RETR " + index);
                 String mail = c.receiveMail();
-                if(mail.contains("+OK")){
+                if (mail.contains("+OK")) {
                     this.mailField.setText(mail);
-                }
-                else{
+                } else {
                     this.mailField.setText("Error in reading the mail.");
                 }
             } catch (IOException ex) {
                 Logger.getLogger(MailFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
     }//GEN-LAST:event_listMailViewMouseClicked
 
     private void quitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitButtonActionPerformed
-        
+        try {
+            c.envoiMsg("QUIT");
+            JOptionPane.showMessageDialog(null, "A bientot!");
+            //TROUVER COMMENT SUPPRIMER LE THREAD 
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Erreur : " + ex);
+            Logger.getLogger(MailFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_quitButtonActionPerformed
 
     private void supprimerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supprimerButtonActionPerformed
-        
-        
+
     }//GEN-LAST:event_supprimerButtonActionPerformed
 
     /**
@@ -208,9 +238,11 @@ public class MailFrame extends javax.swing.JFrame {
     private javax.swing.JLabel bienvenueLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JList<String> listMailView;
     private javax.swing.JScrollPane listPane;
     private javax.swing.JTextArea mailField;
+    private javax.swing.JTextArea outputField;
     private javax.swing.JButton quitButton;
     private javax.swing.JButton supprimerButton;
     // End of variables declaration//GEN-END:variables
