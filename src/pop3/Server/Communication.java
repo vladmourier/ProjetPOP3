@@ -187,6 +187,18 @@ public class Communication extends ObjetConnecte implements Runnable {
              *          Si il y a des erreurs, on envoie -ERR au client
              *          Sinon on envoie +OK Server Signing off
              */
+            boolean deleted;
+            ArrayList<Integer> notDeleted = new ArrayList<>();
+            for(int id : markedAsDeleted){
+                deleted = fileManager.deleteMail(currentUser.getId(), id);
+                if(!deleted) notDeleted.add(id);
+            }
+            if(notDeleted.size()>0){
+                String s = "-ERR "+ notDeleted.size() +" MESSAGES WERE NOT PROPERLY DELETED";
+                sendPop3ServerMessage(new POP3ServerMessage());
+            }else{
+                sendPop3ServerMessage(new POP3ServerMessage(POP3ServerMessage.SERVER_SIGNING_OFF));
+            }
             return true;
         } else {
             sendPop3ServerMessage(new POP3ServerMessage("-ERR INVAID COMMAND"));
