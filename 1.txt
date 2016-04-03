@@ -1,14 +1,23 @@
 1
 MAIL FROM:<test>	
 RCPT TO:User
-<OBJECT>TEST
-
-Corps du mail 1, user 1
-.
+<OBJECT>TEST1
+Corps du mail 1
+\r\n\r\n
 2
-MAIL FROM:<test>	
+MAIL FROM:<test>
+RCPT TO:User,aab
+<OBJECT>TEST2
+Corps du mail 2
+1
+MAIL FROM:<test>
 RCPT TO:User
-<OBJECT>TEST
-
-Corps du mail 2, user 1
-.
+<OBJECT>TEST3
+Corps du mail 1
+\r\n\r\n
+2
+MAIL FROM:<test>
+RCPT TO:User,abb
+<OBJECT>TEST4
+Corps du mail 2
+\r\n\r\n

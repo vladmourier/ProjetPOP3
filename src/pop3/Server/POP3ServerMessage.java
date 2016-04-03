@@ -5,11 +5,14 @@
 */
 package pop3.Server;
 
+import java.util.ArrayList;
+import pop3.Email;
+
 /**
  *
  * @author Vladimir
  */
-public class POP3ServerMessage { 
+public class POP3ServerMessage {
     /**
      * Le corps du message server ; Doit commencer par +OK ou -ERR
      */
@@ -30,18 +33,21 @@ public class POP3ServerMessage {
         this.message = "";
     }
     
-    public POP3ServerMessage getMsgServerReady(){
-        this.message = "+OK POP3 server ready";
+    public POP3ServerMessage(String message) {
+        this.message = message;
+    }
+    public POP3ServerMessage getMsgServerInitMailbox(ArrayList<Email> mails, int size){
+        this.message = "+OK MAILBOX HAS " + mails.size() + " MESSAGES (" + size +" bytes)";
+        this.message += "\r\n";
+        for(Email m : mails){
+            message += mails.indexOf(m)+1 + " " + m.getSize() + "\r\n";
+        }
         return this;
     }
     
-    public POP3ServerMessage getMsgServerSigningOff(){
-        this.message = "+OK POP3 server signing off";
-        return this;
-    }
-    
-    public POP3ServerMessage getMsgServerInitMailbox(int b, int size){
-        this.message = "+OK MAILBOX HAS " + b + " MESSAGES (" + size +" bytes)";
+    public POP3ServerMessage getMsgShowingEmail(Email e){
+        this.message = "+OK " + e.getSize() + " bytes \r\n";
+        message += e.getFullText();
         return this;
     }
     
@@ -53,11 +59,4 @@ public class POP3ServerMessage {
         this.message = message;
     }
     
-    public POP3ServerMessage(String message, boolean isOk) {
-        this.message = message;
-    }
-    
-    public POP3ServerMessage(String message) {
-        this.message = message;
-    }
 }

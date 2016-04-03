@@ -38,23 +38,32 @@ public class EtatTransaction {
     public void run() throws IOException {
         client.changementEtat(client.ETAT_TRANSACTION);
         System.out.println("Vous avez " + nbMsg + " messages dans votre boite mail.\n");
-        System.out.println("---- Accueil ----");
         String queFaire = null;
         while (!quit) {//null == queFaire && 
-            try {
+            try {        
+                System.out.println("------- Accueil -------");
                 System.out.println("Que voulez vous faire?");
                 System.out.println(" 1 - Lire un message");
                 System.out.println(" 2 - Supprimer un message");
                 System.out.println(" 0 - Quitter");
+                System.out.println("***********************");
                 int res = scanner.nextInt();
                 if (res == 1) {
-                    System.out.println("Quel message voulez vous lire?");
+                    System.out.println("Quel message voulez vous lire? (0 pour retourner à l'acceuil)");
                     int lire = scanner.nextInt();
-                    client.envoiMsg("RETR " + lire);
+                    if (lire != 0){
+                        client.envoiMsg("RETR " + lire);
+                        String reponse = client.receiveMail();
+                        System.out.println(reponse);
+                    }
                 } else if (res == 2) {
-                    System.out.println("Quel message voulez vous supprimer?");
+                    System.out.println("Quel message voulez vous supprimer? (0 pour retourner à l'acceuil)");
                     int suppr = scanner.nextInt();
-                    client.envoiMsg("DEL " + suppr);
+                    if (suppr != 0){
+                        client.envoiMsg("DEL " + suppr);
+                        String reponse = client.receive("\r\n");
+                        System.out.println(reponse);
+                    }
                 } else if (res == 0) {
                     quit = true;
                     break;
@@ -62,8 +71,6 @@ public class EtatTransaction {
             } catch (NoSuchElementException e) {
                 System.out.println("Error: " + e.getMessage());
             }
-            String reponse = client.receive();
-            System.out.println(reponse);
         }
         if (quit){
             EtatQuit quitter = new EtatQuit(client);

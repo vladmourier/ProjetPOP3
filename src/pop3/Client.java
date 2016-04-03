@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import static java.lang.Integer.parseInt;
+import static java.lang.Thread.sleep;
 import java.net.*;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -78,11 +79,19 @@ public class Client extends ObjetConnecte{
         return s;
     }
     
+    public String receiveMail(){
+        String mail = receive("\r\n.\r\n");
+        if (mail.startsWith("+OK")){
+            mail = mail.substring(4, mail.length() - 2); //enlève le +OK et le . de la fin
+        }
+        return mail;
+    }
+    
     public void envoiMsg(String msg) throws IOException{
         String s = msg + "\r\n";
         this.BOS.write(s.getBytes());
         this.BOS.flush();
-        this.BOS.flush();
+        //this.BOS.flush();
         System.out.println("J'envoie : " + msg);
     }  
     
@@ -90,7 +99,14 @@ public class Client extends ObjetConnecte{
     public static void main(String args[]) {
         try {
 //            // Etat initialisation----------------------------------------------------
-            Client c = new Client(InetAddress.getByName("localhost"), 110);
+            //Client c = new Client(InetAddress.getByName("localhost"), 110);
+            ConnexionFrame f = new ConnexionFrame();
+            f.setVisible(true);
+            while (f.server==""){
+                //sleep(0);
+            }
+            //Client c = new Client(InetAddress.getByName("134.214.118.6"), 110);
+            Client c = new Client(InetAddress.getByName(f.getServerTxt()), 110);
             EtatInitialisation init = new EtatInitialisation(c);
             
         } catch (IOException ex) {

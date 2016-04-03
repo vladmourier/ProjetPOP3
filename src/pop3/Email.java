@@ -1,8 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package pop3;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class Email {
     private ArrayList<String> destinataires;
     private String objet;
     private String message;
-
+    
     public Email(int id, String expediteur, ArrayList<String> destinataires, String objet, String message) {
         this.id = id;
         this.expediteur = expediteur;
@@ -28,7 +28,7 @@ public class Email {
         this.objet = objet;
         this.message = message;
     }
-
+    
     public Email(int id, String expediteur, String destinataires, String objet, String message) {
         this.id = id;
         this.expediteur = expediteur;
@@ -38,27 +38,27 @@ public class Email {
         this.objet = objet;
         this.message = message;
     }
-
+    
     public String getExpediteur() {
         return expediteur;
     }
-
+    
     public void setExpediteur(String expediteur) {
         this.expediteur = expediteur;
     }
-
+    
     public ArrayList<String> getDestinataires() {
         return destinataires;
     }
-
+    
     public void setDestinataires(ArrayList<String> destinataires) {
         this.destinataires = destinataires;
     }
-
+    
     public String getObjet() {
         return objet;
     }
-
+    
     public void setObjet(String objet) {
         this.objet = objet;
     }
@@ -66,28 +66,40 @@ public class Email {
     public String getMessage() {
         return message;
     }
-
+    
     public void setMessage(String message) {
         this.message = message;
     }
     
     public int getSize(){
-        int res = 0;
-        res += this.expediteur.length()+10;
-        System.out.println("taille exp = " + (this.expediteur.length()+10) + "   " + res);
-        res += this.objet.length()+8;
-        System.out.println("taille obj = " + (this.objet.length()+8) + "   " + res);
-        res += 7;
-        System.out.println("taille obj = " + 7 + "   " + res);
-        for (String s: this.destinataires){
-            res += s.length();
-            System.out.println("Taille dest = " + s.length() + "   " + res);
-            res += 1;
+        //On retourne la taille en additionnant les tailles de chacuns des éléments
+        int size = "MAIL FROM:<>".getBytes().length
+                + "RCPT TO:".getBytes().length
+                + "<OBJECT>".getBytes().length
+                + "\r\n\r\n".getBytes().length
+                + this.expediteur.getBytes().length
+                + this.message.getBytes().length
+                + this.objet.getBytes().length;
+        for(String s : destinataires){
+            size += s.getBytes().length;
         }
-        res += this.message.length();
-        System.out.println("Taille message = " + this.message.length() + "   " + res);
-        
-        return res;
+        return size;
     }
     
+    
+    public String getFullText(){
+        String dest = "";
+        for(String s : destinataires){
+            dest += s;
+            if(destinataires.indexOf(s) != destinataires.size()-1){
+                dest += ",";
+            }
+        }
+        String s = "MAIL FROM: <" + expediteur + "> \r\n"
+                +   "RCPT TO:" + dest + "\r\n"
+                +   "<OBJECT>" + objet + "\r\n"
+                +   this.message
+                + "\r\n";
+        return s;
+    }
 }
