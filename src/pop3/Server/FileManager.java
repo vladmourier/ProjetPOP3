@@ -75,55 +75,51 @@ public class FileManager {
     
     public long getMailsSize(int idu){
         File f = new File(idu+".txt");
+        //TODO
+        //Enlever les numéros de messages et les retour à la ligne pour resultat exact
         return f.length();
     }
     
-    public ArrayList<Email> getMails(int idu) throws IOException {
+    public ArrayList<Email> getMails(int idu){
         ArrayList<Email> mailList = new ArrayList();
-
         try {
             InputStream ips = new FileInputStream(idu + ".txt");
             System.out.println("Ouverture de : " + idu + ".txt");
             InputStreamReader ipsr = new InputStreamReader(ips);
             BufferedReader br = new BufferedReader(ipsr);
-            String line;
-            
-            ArrayList<String> bloc = new ArrayList();
-            int i = 0;
-            
-            while ((line = br.readLine()) != null) {
-                //System.out.println(line);
-                //il faut récupérer bloc par bloc pour générer les mails proprement
-                bloc.add(line);
-                i++;
-                if (line.equals("\\r\\n\\r\\n")) {
-                    //System.out.println("New Mail");
-                    int idm = Integer.parseInt(bloc.get(0));
-                    //commencer à lire à partir du char n°10, jusqu'à la fin
-                    String sender = bloc.get(1).substring(10, bloc.get(1).length());
-                    //commencer à lire à partir du char n°8 jusqu'à la fin, et parser selon les virgules
-                    String[] receiver = (bloc.get(2).substring(8, bloc.get(2).length())).split(",");
-                    ArrayList<String> rcpt = new ArrayList();
-                    for (String ln : receiver) {
-                        rcpt.add(ln);
+            Email mail = new Email();
+            int lineId=0;
+            String line, body ="";
+            while((line= br.readLine()) != null){
+                if(line.equals("\\r\\n\\r\\n")){
+                    mail.setMessage(body);
+                    mailList.add(mail);
+                    mail = new Email();
+                    lineId = 0;
+                    body = "";
+                } else
+                if(line.startsWith("MAIL FROM:")){
+                    String exp = line.split(":")[1];
+                    exp= exp.substring(1, exp.length()-1);
+                    mail.setExpediteur(exp);
+                } else
+                if(line.startsWith("RCPT TO:")){
+                    for(String s : line.split(":")[1].split(",")){
+                        mail.addDestinataire(s);
                     }
-                    //commencer à lire à partir du char n°8 jusqu'à la fin
-                    String object = bloc.get(3).substring(8, bloc.get(3).length());
-                    //Récupération du corps du mail
-                    String mail = null;
-                    for (int c = 4; c > bloc.size(); c++) {
-                        mail.concat(bloc.get(c));
-                    }
-                    Email mailTemp = new Email(idu, sender, rcpt, object, mail);
-                    mailList.add(mailTemp); //fin traitement du mail, on passe au suivant
-                    i = 0;
-                    bloc = new ArrayList();
+                } else
+                if(line.startsWith("<OBJECT>")){
+                    mail.setObjet(line.substring("<OBJECT>".length()));
+                } else if (lineId==0) {
+                    mail.setId(Integer.parseInt(line));
+                } else {
+                    body += line;
                 }
+                lineId++;
             }
-            br.close();
-            ipsr.close();
-            ips.close();
         } catch (FileNotFoundException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -152,9 +148,9 @@ public class FileManager {
             String line;
             boolean newMail = true;
             boolean goodMail = true;
-
+            
             while ((line = br.readLine()) != null) {
-
+                
                 //si on entame un nouveau mail on vérifie que ce ne soit pas celui à supprimer
                 if (newMail == true) {
                     //System.out.println(newMail);
@@ -167,7 +163,7 @@ public class FileManager {
                         goodMail = true;
                     }
                 }
-
+                
                 //si on est dans un mail à garder, on le recopie simplement
                 if (goodMail == true) {
                     //System.out.println("goodMail est true");
@@ -175,13 +171,13 @@ public class FileManager {
                     bw.write("\r\n");
                     bw.flush();
                 }
-
+                
                 //Si on atteint une fin de mail, on le signale pour la prochaine lecture
-                if (line.equals("\\r\\n\\r\\n")) {
+                if (line.equals(".")) {
                     newMail = true;
                 }
             }
-
+            
             //On ferme les buffers et flux
             br.close();
             ipsr.close();
@@ -195,7 +191,7 @@ public class FileManager {
             System.out.println("Renommage : "+fTemp.renameTo(f));
             f = new File(idu + "'.txt");
             f.delete();
-
+            
         } catch (FileNotFoundException ex) {
             Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -207,13 +203,13 @@ public class FileManager {
     /*
     public boolean writeMail(int idu, Email mail)
     {
-        boolean wri = false;
-        
-        try{
-            
-        }
-        
-        return wri;
+    boolean wri = false;
+    
+    try{
+    
+    }
+    
+    return wri;
     }
     */
 }

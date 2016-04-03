@@ -1,23 +1,26 @@
 1
-MAIL FROM:<test>
+MAIL FROM:<test>	
 RCPT TO:User
-<OBJECT>TEST
+<OBJECT>TEST1
 Corps du mail 1
+Je suis ton père
 \r\n\r\n
 2
 MAIL FROM:<test>
-RCPT TO:User,aaa
-<OBJECT>TEST
+RCPT TO:User,aab
+<OBJECT>TEST2
 Corps du mail 2
-1
+Je développe un serveur POP3
+\r\n\r\n
+3
 MAIL FROM:<test>
 RCPT TO:User
-<OBJECT>TEST
+<OBJECT>TEST3
 Corps du mail 1
 \r\n\r\n
-2
+4
 MAIL FROM:<test>
-RCPT TO:User,aaa
-<OBJECT>TEST
+RCPT TO:User,abb
+<OBJECT>TEST4
 Corps du mail 2
 \r\n\r\n

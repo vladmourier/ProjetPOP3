@@ -40,16 +40,15 @@ public class POP3ServerMessage {
         this.message = "+OK CURRENT MAILBOX HAS " + mails.size() + " MESSAGES (" + size +" bytes)";
         this.message += "\r\n";
         for(Email m : mails){
-            message += mails.indexOf(m)+1 + " " + 10 + "\r\n";
+            message += mails.indexOf(m)+1 + " " + m.getSize() + "\r\n";
         }
-        message += ".";
         return this;
     }
     
     public POP3ServerMessage getMsgShowingEmail(Email e){
-//        this.message = "+OK " + e.getSize() + " bytes \r\n";
-//        message += e.
-        return null;
+        this.message = "+OK " + e.getSize() + " bytes \r\n";
+        message += e.getFullText() + ".";
+        return this;
     }
     
     public String getMessage() {

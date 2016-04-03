@@ -86,21 +86,11 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
     
     public ArrayList<Email> retrieveUserMessages(){
-        try {
-            return fileManager.getMails(currentUser.getId());
-        } catch (IOException ex) {
-            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
+        return fileManager.getMails(currentUser.getId());
     }
     
     public Email retrieveUserMessage(int i){
-        try {
-            return fileManager.getMails(currentUser.getId()).get(i-1);
-        } catch (IOException ex) {
-            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
+        return fileManager.getMails(currentUser.getId()).get(i-1);
     }
     
     public int getUserIdFromUsername(String username) throws IOException{
@@ -139,6 +129,9 @@ public class Communication extends ObjetConnecte implements Runnable {
             userid = fileManager.findUser(user);
             if(userid==0) return false;
             okPass = fileManager.verifyPass(userid, pass);
+            if(okPass && okUser){
+                currentUser = new User(userid, user, pass);
+            }
         } catch (IOException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -147,12 +140,11 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     private boolean RetrieveCommandIsValid(String s ){
         if(s.startsWith("RETR")){
-            try {
-                if(fileManager.getMails(currentUser.getId()).size() >= Integer.parseInt(s.split(" ")[1])){
-                    return true;
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            int nb = fileManager.getMails(currentUser.getId()).size();
+            String sub = s.split(" ")[1];
+            int target = Integer.parseInt(sub.split("\r\n")[0]);
+            if(nb >= target){
+                return true;
             }
         }
         return false;
@@ -160,12 +152,8 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     private boolean DeleteCommandIsValid(String s){
         if(s.startsWith("DELE")){
-            try {
-                if(fileManager.getMails(currentUser.getId()).size() >= Integer.parseInt(s.split(" ")[1])){
-                    return true;
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+            if(fileManager.getMails(currentUser.getId()).size() >= Integer.parseInt(s.split(" ")[1])){
+                return true;
             }
         }
         return false;
@@ -176,9 +164,9 @@ public class Communication extends ObjetConnecte implements Runnable {
         received = new String(buffer);
         if(received.startsWith("RETR")){
             if(RetrieveCommandIsValid(received)){
-                /**
-                 * TODO
-                 */
+                System.out.println("OK");
+                POP3ServerMessage p = new POP3ServerMessage();
+                sendPop3ServerMessage(p.getMsgShowingEmail(retrieveUserMessage(Integer.parseInt(received.split(" ")[1].split("\r\n")[0]))));
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR THE MAILBOX DOES NOT CONTAIN THE REQUESTED MESSAGE"));
             }
@@ -239,9 +227,9 @@ public class Communication extends ObjetConnecte implements Runnable {
                 /**
                  * TODO : mettre modifier l'user courant
                  */
-            POP3ServerMessage m = new POP3ServerMessage();
-            sendPop3ServerMessage(m.getMsgServerInitMailbox(fileManager.getMails(currentUser == null ? fileManager.findUser(received.split(" ")[1]) : currentUser.getId()),(int) fileManager.getMailsSize(currentUser == null ? fileManager.findUser(received.split(" ")[1]) : currentUser.getId())));
-
+                POP3ServerMessage m = new POP3ServerMessage();
+                sendPop3ServerMessage(m.getMsgServerInitMailbox(fileManager.getMails(currentUser == null ? fileManager.findUser(received.split(" ")[1]) : currentUser.getId()),(int) fileManager.getMailsSize(currentUser == null ? fileManager.findUser(received.split(" ")[1]) : currentUser.getId())));
+                
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR APOP COMMAND IS NOT VALID OR THE REQUESTED CREDENTIALS WERE NOT CORRECT"));
             }
