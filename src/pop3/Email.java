@@ -82,12 +82,14 @@ public class Email {
         int size = "MAIL FROM:<>".getBytes().length
                 + "RCPT TO:".getBytes().length
                 + "<OBJECT>".getBytes().length
-                + "\\r\\n\\r\\n".getBytes().length
                 + this.expediteur.getBytes().length
                 + this.message.getBytes().length
                 + this.objet.getBytes().length;
         for(String s : destinataires){
             size += s.getBytes().length;
+            if(destinataires.lastIndexOf(s) != destinataires.size()-1){
+                size += ",".getBytes().length;
+            }
         }
         return size;
     }

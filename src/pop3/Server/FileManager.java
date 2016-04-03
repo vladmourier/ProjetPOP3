@@ -75,9 +75,16 @@ public class FileManager {
     
     public long getMailsSize(int idu){
         File f = new File(idu+".txt");
+        ArrayList<Email> mails = getMails(idu);
+        String s;
+        int Ids_size =0;
+        for(Email e : mails){
+            s = "" + e.getId();
+            Ids_size += s.getBytes().length;
+        }
         //TODO
         //Enlever les numéros de messages et les retour à la ligne pour resultat exact
-        return f.length();
+        return f.length() - (mails.size() * "\\r\\n\\r\\n".getBytes().length) - Ids_size;
     }
     
     public ArrayList<Email> getMails(int idu){

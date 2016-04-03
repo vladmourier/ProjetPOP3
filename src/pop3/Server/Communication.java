@@ -227,8 +227,12 @@ public class Communication extends ObjetConnecte implements Runnable {
                 /**
                  * TODO : mettre modifier l'user courant
                  */
+                String userid = received.split(" ")[1];
                 POP3ServerMessage m = new POP3ServerMessage();
-                sendPop3ServerMessage(m.getMsgServerInitMailbox(fileManager.getMails(currentUser == null ? fileManager.findUser(received.split(" ")[1]) : currentUser.getId()),(int) fileManager.getMailsSize(currentUser == null ? fileManager.findUser(received.split(" ")[1]) : currentUser.getId())));
+                sendPop3ServerMessage(m.getMsgServerInitMailbox(
+                        fileManager.getMails(currentUser == null ? fileManager.findUser(userid) : currentUser.getId()),
+                        (int) fileManager.getMailsSize(currentUser == null ? fileManager.findUser(userid) : currentUser.getId()))
+                );
                 
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR APOP COMMAND IS NOT VALID OR THE REQUESTED CREDENTIALS WERE NOT CORRECT"));
