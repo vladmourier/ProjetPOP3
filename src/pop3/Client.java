@@ -84,8 +84,19 @@ public class Client extends ObjetConnecte {
         int ok;
         try {
             ok = BIS.read(buffer);
-            s = new String(buffer);//premiere ligne
-            if (s.contains("+OK")) { //on vérifie si c'est un mail ou une erreur
+            while (ok != -1) {
+                s += new String(buffer);
+                if (s.contains("+OK") && s.endsWith("\r\n.\r\n")) {
+                    ok = -1;
+                } else if (s.contains("-ERR") && s.endsWith("\r\n")) {
+                    ok = -1;
+                } else {
+                    ok = BIS.read(buffer);
+                }
+            }
+            System.out.println(s);
+/*
+            if (s.contains("+")) { //on vérifie si c'est un mail ou une erreur
                 while (ok != -1) {
                     s += new String(buffer);
                     if (s.endsWith("\r\n.\r\n")) {
@@ -94,7 +105,7 @@ public class Client extends ObjetConnecte {
                         ok = BIS.read(buffer);
                     }
                 }
-            } else {
+            } else if (s.contains("-")) {
                 if (s.endsWith("\r\n")) {
                     ok = -1;
                 } else {
@@ -108,7 +119,9 @@ public class Client extends ObjetConnecte {
                         ok = BIS.read(buffer);
                     }
                 }
-            }
+            } else {
+                return "!!ERROR";
+            }*/
         } catch (IOException ex) {
             Logger.getLogger(ObjetConnecte.class.getName()).log(Level.SEVERE, null, ex);
         }
