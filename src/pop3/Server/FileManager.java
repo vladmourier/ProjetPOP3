@@ -19,7 +19,7 @@ public class FileManager {
     
     final String user_pass = "User_Pass.txt";
     
-    public int findUser(String usr) throws IOException {
+    public int findUserId(String usr) throws IOException {
         int id = 0;
         
         try {
@@ -42,6 +42,64 @@ public class FileManager {
         }
         
         return id;
+    }
+    
+    public User retrieveUser(String usr){
+        User u = new User();
+        
+        try {
+            InputStream ips = new FileInputStream(user_pass);
+            InputStreamReader ipsr = new InputStreamReader(ips);
+            BufferedReader br = new BufferedReader(ipsr);
+            String line;
+            
+            while ((line = br.readLine()) != null) {
+                //System.out.println(line);
+                //il faut parser line entre chaque tabulation pour tester
+                String[] user = line.split("\t");
+                if (usr.equals(user[0])) {
+                    u.setId(Integer.parseInt(user[2]));
+                    u.setUsername(user[0]);
+                    u.setPass(user[1]);
+                    break;
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return u;
+    }
+    
+    public User retrieveUser(int usr){
+        User u = new User();
+        
+        try {
+            InputStream ips = new FileInputStream(user_pass);
+            InputStreamReader ipsr = new InputStreamReader(ips);
+            BufferedReader br = new BufferedReader(ipsr);
+            String line;
+            
+            while ((line = br.readLine()) != null) {
+                //System.out.println(line);
+                //il faut parser line entre chaque tabulation pour tester
+                String[] user = line.split("\t");
+                if (Integer.parseInt(user[2]) == usr) {
+                    u.setId(Integer.parseInt(user[2]));
+                    u.setUsername(user[0]);
+                    u.setPass(user[1]);
+                    break;
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return u;
     }
     
     public boolean verifyPass(int id, String pass) throws IOException {
@@ -75,9 +133,16 @@ public class FileManager {
     
     public long getMailsSize(int idu){
         File f = new File(idu+".txt");
+        ArrayList<Email> mails = getMails(idu);
+        String s;
+        int Ids_size =0;
+        for(Email e : mails){
+            s = "" + e.getId();
+            Ids_size += s.getBytes().length;
+        }
         //TODO
         //Enlever les numéros de messages et les retour à la ligne pour resultat exact
-        return f.length();
+        return f.length() - (mails.size() * "\\r\\n\\r\\n".getBytes().length) - Ids_size;
     }
     
     public ArrayList<Email> getMails(int idu){
@@ -98,23 +163,23 @@ public class FileManager {
                     lineId = 0;
                     body = "";
                 } else
-                if(line.startsWith("MAIL FROM:")){
-                    String exp = line.split(":")[1];
-                    exp= exp.substring(1, exp.length()-1);
-                    mail.setExpediteur(exp);
-                } else
-                if(line.startsWith("RCPT TO:")){
-                    for(String s : line.split(":")[1].split(",")){
-                        mail.addDestinataire(s);
-                    }
-                } else
-                if(line.startsWith("<OBJECT>")){
-                    mail.setObjet(line.substring("<OBJECT>".length()));
-                } else if (lineId==0) {
-                    mail.setId(Integer.parseInt(line));
-                } else {
-                    body += line;
-                }
+                    if(line.startsWith("MAIL FROM:")){
+                        String exp = line.split(":")[1];
+                        exp= exp.substring(1, exp.length()-1);
+                        mail.setExpediteur(exp);
+                    } else
+                        if(line.startsWith("RCPT TO:")){
+                            for(String s : line.split(":")[1].split(",")){
+                                mail.addDestinataire(s);
+                            }
+                        } else
+                            if(line.startsWith("<OBJECT>")){
+                                mail.setObjet(line.substring("<OBJECT>".length()));
+                            } else if (lineId==0) {
+                                mail.setId(Integer.parseInt(line));
+                            } else {
+                                body += line;
+                            }
                 lineId++;
             }
         } catch (FileNotFoundException ex) {
@@ -126,7 +191,63 @@ public class FileManager {
         return mailList;
     }
     
-    public boolean deleteMail(int idu, int idm) {
+    public boolean deleteMail(int idu, int idm){
+        boolean deleted = false;
+        File f = new File(idu + ".txt");
+        File fTemp = new File(idu + "-.txt");
+        try {
+            fTemp.createNewFile();
+            InputStream ips = new FileInputStream(f);
+            System.out.println("Ouverture de : " + idu + ".txt");
+            InputStreamReader ipsr = new InputStreamReader(ips);
+            BufferedReader br = new BufferedReader(ipsr);
+            int lineId=0, current_mail_id = 0;
+            String line;
+            OutputStream ops = new FileOutputStream(fTemp);
+            OutputStreamWriter opsw = new OutputStreamWriter(ops);
+            while((line= br.readLine()) != null){
+                if(lineId == 0){
+                    current_mail_id = Integer.parseInt(line);
+                    lineId++;
+                }
+                if (current_mail_id != idm){
+                    opsw.write(line + "\r\n");
+                    opsw.flush();
+                    lineId++;
+                }
+                if(line.equals("\\r\\n\\r\\n")){
+                    lineId = 0;
+                }
+            }
+            br.close();
+            br = null;
+            ipsr.close();
+            ipsr = null;
+            ips.close();
+            ips = null;
+            opsw.close();
+            opsw = null;
+            ops.close();
+            ops = null;
+            //on peut supprimer le fichier inital et renommer le fichier temporaire
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.gc();
+        f.setWritable(true);
+        System.out.println(f.delete());
+        return fTemp.renameTo(f);
+    }
+    
+    /**
+     * ------------- NOT WORKING ----------
+     * @param idu
+     * @param idm
+     * @return 
+     */
+    public boolean deleteMail2(int idu, int idm) {
         boolean dele = false;
         
         try {
