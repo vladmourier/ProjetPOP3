@@ -39,7 +39,7 @@ public class MailFrame extends javax.swing.JFrame {
                 if (test.contains("+OK")) {
                     Email mail = new Email(test, i);
                     listMail.add(mail);// on le stock localement
-                    c.envoiMsg("DEL " + i);//on le supprime du server
+                    c.envoiMsg("DELE " + i);//on le supprime du server
                     c.receive("\r\n");
                     listModel.addElement(mail.getObjet());
                 }
