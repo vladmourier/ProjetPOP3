@@ -220,8 +220,8 @@ public class MailFrame extends javax.swing.JFrame {
     private void quitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitButtonActionPerformed
         try {
             c.envoiMsg("QUIT");
-            c.receive("\r\n");
-            JOptionPane.showMessageDialog(null, "A bientot!");
+            String a = c.receive("\r\n");
+            JOptionPane.showMessageDialog(null, "A bientot!\n" + a);
             this.dispose();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Erreur : " + ex);

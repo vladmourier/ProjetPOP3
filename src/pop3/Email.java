@@ -47,13 +47,13 @@ public class Email {
     public Email(String mail, int id) {
         this.id = id;
         String[] mailSplited = mail.split("\r\n");
-        this.expediteur = mailSplited[0].split("<")[1].substring(0, mailSplited[0].split("<")[1].length()-1);
-        String[] dests = mailSplited[1].split(":")[1].split(",");
+        this.expediteur = mailSplited[1].split(":")[1];
+        String[] dests = mailSplited[2].split(":")[1].split(",");
         this.destinataires = new ArrayList<>();
         this.destinataires.addAll(Arrays.asList(dests));
-        this.objet = mailSplited[2].split(">")[1];
+        this.objet = mailSplited[3].split(">")[1];
         this.message = "";
-        for (int i = 3; i<= mailSplited.length -2; i++){
+        for (int i = 4; i<= mailSplited.length; i++){
             this.message += mailSplited[i];
         }
     }
