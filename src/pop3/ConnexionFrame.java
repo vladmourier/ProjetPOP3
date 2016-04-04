@@ -24,6 +24,7 @@ public class ConnexionFrame extends javax.swing.JFrame {
     String server;
     String user;
     String mdp;
+
     /**
      * Creates new form ClientFrame
      */
@@ -211,22 +212,22 @@ public class ConnexionFrame extends javax.swing.JFrame {
         try {
             //EtatInitialisation init = new EtatInitialisation(c);
             //init.connection(this.getUserTxt(), this.getMdpTxt());
-            if (this.userField.getText()!=""){
-                c.envoiMsg("APOP " + this.getUserTxt()+ " " + this.getMdpTxt());
+            if (this.userField.getText() != "") {
+                c.envoiMsg("APOP " + this.getUserTxt() + " " + this.getMdpTxt());
                 String reponse = c.receive("\r\n");
                 this.outputField.setText(reponse + "\n" + this.outputField.getText());
-                if (reponse.contains("+OK")){
+                if (reponse.contains("+OK")) {
                     JOptionPane.showMessageDialog(null, "Connection réussie\nBienvenue, " + this.getUserTxt());
                     int nbMsg = parseInt(reponse.split(" ")[4]);
-                    this.setVisible(false);
+                    //this.setVisible(false);
+                    this.dispose();
                     MailFrame mailFrame = new MailFrame(nbMsg, user, c);//nbMsg
                     mailFrame.setVisible(true);
-                }
-                else {
+                } else {
                     this.outputField.setText("Mot de passe erroné" + this.outputField.getText());
                 }
             }
-            
+
         } catch (IOException ex) {
             Logger.getLogger(ConnexionFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -234,13 +235,19 @@ public class ConnexionFrame extends javax.swing.JFrame {
 
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         try {
-           this.getServerTxt();
-           if (!"".equals(this.server)){
+            this.getServerTxt();
+            if (!"".equals(this.server)) {
                 c = new Client(InetAddress.getByName(this.server), 110);
-                JOptionPane.showMessageDialog(null, "Serveur atteint");
-                this.outputField.setText(c.receive("\r\n") + this.outputField.getText());
-                this.connectButton.setEnabled(true);
-           }
+                String reponse = c.receive("\r\n");
+                this.outputField.setText(reponse + this.outputField.getText());
+                if (reponse.contains("+OK")) {
+                    JOptionPane.showMessageDialog(null, "Serveur atteint");
+                    this.connectButton.setEnabled(true);
+                } else {
+                    this.connectButton.setEnabled(false);
+                    JOptionPane.showMessageDialog(null, "Serveur non atteint");
+                }
+            }
         } catch (IOException ex) {
             this.outputField.setText(ex + "\n" + this.outputField.getText());
             this.connectButton.setEnabled(false);
@@ -248,19 +255,21 @@ public class ConnexionFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_testButtonActionPerformed
 
-    public String getServerTxt(){
+    public String getServerTxt() {
         server = this.serverField.getText();
         return this.server;
     }
-    public String getUserTxt(){
+
+    public String getUserTxt() {
         user = this.userField.getText();
         return this.user;
     }
-    
-    public String getMdpTxt(){
+
+    public String getMdpTxt() {
         mdp = new String(this.mdpField.getPassword());
         return this.mdp;
     }
+
     /**
      * @param args the command line arguments
      */

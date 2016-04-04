@@ -65,6 +65,14 @@ public class Email {
     public ArrayList<String> getDestinataires() {
         return destinataires;
     }
+    
+    public String getDestinatairesString(){
+        String dest = "";
+        for (int i = 0 ; i< destinataires.size(); i++){
+            dest += destinataires.get(i) + "; ";
+        }
+        return dest;
+    }
 
     public void setDestinataires(ArrayList<String> destinataires) {
         this.destinataires = destinataires;
