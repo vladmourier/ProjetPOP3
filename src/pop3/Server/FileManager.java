@@ -238,7 +238,9 @@ public class FileManager {
         System.gc();
         f.setWritable(true);
         System.out.println(f.delete());
-        return fTemp.renameTo(f);
+        boolean a = fTemp.renameTo(f);
+        System.out.println(a);
+        return a;
     }
     
     /**

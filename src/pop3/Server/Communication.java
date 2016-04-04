@@ -179,6 +179,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         } else if (received.startsWith("DELE")){
             if(DeleteCommandIsValid(received)){
                 markedAsDeleted.add(Integer.parseInt(received.split(" ")[1].split("\r\n")[0]));
+                sendPop3ServerMessage(new POP3ServerMessage("+OK MESSAGE MARKED FOR DELETION"));
             } else {
                 sendPop3ServerMessage(new POP3ServerMessage("-ERR A PROBLEM OCCURED DURING DELETION"));
             }
