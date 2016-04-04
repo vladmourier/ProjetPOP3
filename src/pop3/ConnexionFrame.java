@@ -5,7 +5,6 @@
  */
 package pop3;
 
-import Etats.EtatInitialisation;
 import java.io.IOException;
 import static java.lang.Integer.parseInt;
 import java.net.InetAddress;

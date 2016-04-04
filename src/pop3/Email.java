@@ -53,7 +53,7 @@ public class Email {
         this.destinataires.addAll(Arrays.asList(dests));
         this.objet = mailSplited[3].split(">")[1];
         this.message = "";
-        for (int i = 4; i<= mailSplited.length; i++){
+        for (int i = 4; i<= mailSplited.length-2; i++){
             this.message += mailSplited[i];
         }
     }
