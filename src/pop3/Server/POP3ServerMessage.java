@@ -38,10 +38,11 @@ public class POP3ServerMessage {
     }
     public POP3ServerMessage getMsgServerInitMailbox(ArrayList<Email> mails, int size){
         this.message = "+OK CURRENT MAILBOX HAS " + mails.size() + " MESSAGES (" + size +" bytes)";
-        this.message += "\r\n";
-        for(Email m : mails){
-            message += mails.indexOf(m)+1 + " " + m.getSize() + "\r\n";
-        }
+//        this.message += "\r\n";
+//        for(Email m : mails){
+//            message += mails.indexOf(m)+1 + " " + m.getSize() + "\r\n";
+//        }
+//        message += ".";
         return this;
     }
     
