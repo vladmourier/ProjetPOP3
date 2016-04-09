@@ -22,7 +22,9 @@ public class Serveur{
    public Serveur(int port_s) throws SocketException, IOException{
     this.socketServer = new ServerSocket(port_s);
    }
-   
+   public Serveur(){
+       
+   }
    public void run() {
        while (true) {
            try {

@@ -61,7 +61,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             POP3ServerMessage msg = new POP3ServerMessage(POP3ServerMessage.SERVER_READY);
             this.sendPop3ServerMessage(msg);
             currentState = ETAT_AUTORISATION;
-            while(true && !quit_asked){
+            while(!quit_asked){
                 switch(currentState){
                     case ETAT_AUTORISATION:
                         quit_asked = manageAuthorizationState(received, buffer);
