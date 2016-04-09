@@ -39,7 +39,7 @@ public class MailFrame extends javax.swing.JFrame {
                 if (test.contains("+OK")) {
                     Email mail = new Email(test, i);
                     listMail.add(mail);// on le stock localement
-                    c.envoiMsg("DEL " + i);//on le supprime du server
+                    c.envoiMsg("DELE " + i);//on le supprime du server
                     c.receive("\r\n");
                     listModel.addElement(mail.getObjet());
                 }
@@ -52,7 +52,7 @@ public class MailFrame extends javax.swing.JFrame {
             }
         }
         this.listMailView.setModel(listModel);
-        this.supprimerButton.setEnabled(false);
+        this.supprimerButton.setVisible(false);
     }
 
     /**
@@ -66,7 +66,6 @@ public class MailFrame extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         mailField = new javax.swing.JTextArea();
-        jLabel1 = new javax.swing.JLabel();
         bienvenueLabel = new javax.swing.JLabel();
         listPane = new javax.swing.JScrollPane();
         listMailView = new javax.swing.JList<>();
@@ -74,14 +73,18 @@ public class MailFrame extends javax.swing.JFrame {
         quitButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         outputField = new javax.swing.JTextArea();
+        expediteurField = new javax.swing.JTextField();
+        destinataireField = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        objetField = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         mailField.setColumns(20);
         mailField.setRows(5);
         jScrollPane1.setViewportView(mailField);
-
-        jLabel1.setText("Lecture mail");
 
         bienvenueLabel.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         bienvenueLabel.setText("Bienvenue, ");
@@ -116,6 +119,12 @@ public class MailFrame extends javax.swing.JFrame {
         outputField.setRows(5);
         jScrollPane2.setViewportView(outputField);
 
+        jLabel1.setText("Expediteur:");
+
+        jLabel2.setText("Destinataires:");
+
+        jLabel3.setText("Objet:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -130,9 +139,18 @@ public class MailFrame extends javax.swing.JFrame {
                         .addComponent(supprimerButton))
                     .addComponent(jScrollPane2))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(expediteurField, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(destinataireField, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(objetField))))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(175, 175, 175)
@@ -144,19 +162,30 @@ public class MailFrame extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(29, 29, 29)
                 .addComponent(bienvenueLabel)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(38, 38, 38)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(listPane, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(supprimerButton)
                             .addComponent(quitButton))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(expediteurField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(destinataireField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(objetField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -164,12 +193,16 @@ public class MailFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void listMailViewMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listMailViewMouseClicked
-        if (evt.getClickCount() >= 1) {
+        int index = this.listMailView.locationToIndex(evt.getPoint());
+        this.expediteurField.setText(listMail.get(index).getExpediteur());
+        this.destinataireField.setText(listMail.get(index).getDestinatairesString());
+        this.objetField.setText(listMail.get(index).getObjet());
+        this.mailField.setText(listMail.get(index).getMessage());
+        /*if (evt.getClickCount() >= 1) {
             this.supprimerButton.setEnabled(true);
         }
         if (evt.getClickCount() == 2) {
             try {
-                int index = this.listMailView.locationToIndex(evt.getPoint()) + 1;
                 this.c.envoiMsg("RETR " + index);
                 String mail = c.receiveMail();
                 if (mail.contains("+OK")) {
@@ -180,15 +213,16 @@ public class MailFrame extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(MailFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        }*/
 
     }//GEN-LAST:event_listMailViewMouseClicked
 
     private void quitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitButtonActionPerformed
         try {
             c.envoiMsg("QUIT");
-            JOptionPane.showMessageDialog(null, "A bientot!");
-            //TROUVER COMMENT SUPPRIMER LE THREAD 
+            String a = c.receive("\r\n");
+            JOptionPane.showMessageDialog(null, "A bientot!\n" + a);
+            this.dispose();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Erreur : " + ex);
             Logger.getLogger(MailFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -196,7 +230,13 @@ public class MailFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_quitButtonActionPerformed
 
     private void supprimerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supprimerButtonActionPerformed
-
+        try {
+            c.envoiMsg("DELE " + 2);
+            c.receive("\r\n");
+        } catch (IOException ex) {
+            Logger.getLogger(MailFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_supprimerButtonActionPerformed
 
     /**
@@ -236,12 +276,17 @@ public class MailFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bienvenueLabel;
+    private javax.swing.JTextField destinataireField;
+    private javax.swing.JTextField expediteurField;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JList<String> listMailView;
     private javax.swing.JScrollPane listPane;
     private javax.swing.JTextArea mailField;
+    private javax.swing.JTextField objetField;
     private javax.swing.JTextArea outputField;
     private javax.swing.JButton quitButton;
     private javax.swing.JButton supprimerButton;

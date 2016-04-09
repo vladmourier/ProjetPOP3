@@ -1,8 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package pop3.Server;
 
 import java.io.IOException;
@@ -25,12 +25,16 @@ public class Serveur{
    public Serveur(){
        
    }
-   public void run() {
+   public void run(boolean secured) {
        while (true) {
            try {
                 Socket Sclient = this.socketServer.accept();
-                new Thread(new Communication(Sclient)).start();
-                //this.socketServer.close();         
+                if(secured){
+                    new Thread(new Communication(Sclient)).start();
+                } else {
+                    new Thread(new CommunicationSecured(Sclient)).start();
+                }
+                //this.socketServer.close();
             } catch (IOException ex) {
                 Logger.getLogger(POP3.class.getName()).log(Level.SEVERE, null, ex);
             }

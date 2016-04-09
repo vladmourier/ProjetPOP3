@@ -5,15 +5,9 @@
  */
 package pop3;
 
-import Etats.EtatInitialisation;
-import Etats.EtatTransaction;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import static java.lang.Integer.parseInt;
-import static java.lang.Thread.sleep;
 import java.net.*;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -84,8 +78,19 @@ public class Client extends ObjetConnecte {
         int ok;
         try {
             ok = BIS.read(buffer);
-            s = new String(buffer);//premiere ligne
-            if (s.contains("+OK")) { //on vérifie si c'est un mail ou une erreur
+            while (ok != -1) {
+                s += new String(buffer);
+                if (s.contains("+OK") && s.endsWith("\r\n.\r\n")) {
+                    ok = -1;
+                } else if (s.contains("-ERR") && s.endsWith("\r\n")) {
+                    ok = -1;
+                } else {
+                    ok = BIS.read(buffer);
+                }
+            }
+            System.out.println(s);
+/*
+            if (s.contains("+")) { //on vérifie si c'est un mail ou une erreur
                 while (ok != -1) {
                     s += new String(buffer);
                     if (s.endsWith("\r\n.\r\n")) {
@@ -94,7 +99,7 @@ public class Client extends ObjetConnecte {
                         ok = BIS.read(buffer);
                     }
                 }
-            } else {
+            } else if (s.contains("-")) {
                 if (s.endsWith("\r\n")) {
                     ok = -1;
                 } else {
@@ -108,7 +113,9 @@ public class Client extends ObjetConnecte {
                         ok = BIS.read(buffer);
                     }
                 }
-            }
+            } else {
+                return "!!ERROR";
+            }*/
         } catch (IOException ex) {
             Logger.getLogger(ObjetConnecte.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -122,23 +129,5 @@ public class Client extends ObjetConnecte {
         this.BOS.flush();
         //this.BOS.flush();
         System.out.println("J'envoie : " + msg);
-    }
-
-    public static void main(String args[]) {
-        try {
-//            // Etat initialisation----------------------------------------------------
-            //Client c = new Client(InetAddress.getByName("localhost"), 110);
-            ConnexionFrame f = new ConnexionFrame();
-            f.setVisible(true);
-            while (f.server == "") {
-                //sleep(0);
-            }
-            //Client c = new Client(InetAddress.getByName("134.214.118.6"), 110);
-            Client c = new Client(InetAddress.getByName(f.getServerTxt()), 110);
-            EtatInitialisation init = new EtatInitialisation(c);
-
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 }
