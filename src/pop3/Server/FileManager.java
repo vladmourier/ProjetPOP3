@@ -128,7 +128,7 @@ public class FileManager {
                             MessageDigest md = MessageDigest.getInstance("MD5");
                             String s = user[1] + timestamp;
                             System.out.println(s);
-                            String r = new String(md.digest(s.getBytes()));
+                            String r = Tools.encrypt(s);
                             if(pass.equals(r)){
                                 ok = true;
                             }

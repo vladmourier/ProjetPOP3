@@ -5,6 +5,7 @@
 */
 package pop3;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.io.IOException;
 import static java.lang.Integer.parseInt;
 import java.net.InetAddress;
@@ -273,14 +274,9 @@ public class ConnexionFrame extends javax.swing.JFrame {
         if(!secured){
             mdp = new String(this.mdpField.getPassword());
         } else {
-            try {
-                String pass = new String(this.mdpField.getPassword()) + timestamp;
-                System.out.println(pass);
-                MessageDigest md = MessageDigest.getInstance("MD5");
-                mdp = new String(md.digest(pass.getBytes()));
-            } catch (NoSuchAlgorithmException ex) {
-                Logger.getLogger(ConnexionFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            String pass = new String(this.mdpField.getPassword()) + timestamp.substring(0, timestamp.length()-2);
+            System.out.println("PASS = " + pass);
+            mdp = Tools.encrypt(pass);
         }
         return this.mdp;
     }
