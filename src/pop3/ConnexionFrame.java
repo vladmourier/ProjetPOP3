@@ -1,13 +1,15 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package pop3;
 
 import java.io.IOException;
 import static java.lang.Integer.parseInt;
 import java.net.InetAddress;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
@@ -18,12 +20,13 @@ import javax.swing.JOptionPane;
  * @author mathieu
  */
 public class ConnexionFrame extends javax.swing.JFrame {
-
+    
     Client c;
     String server;
     String user;
     String mdp;
-
+    String timestamp;
+    
     /**
      * Creates new form ClientFrame
      */
@@ -33,7 +36,7 @@ public class ConnexionFrame extends javax.swing.JFrame {
         user = "";
         mdp = "";
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -212,7 +215,7 @@ public class ConnexionFrame extends javax.swing.JFrame {
             //EtatInitialisation init = new EtatInitialisation(c);
             //init.connection(this.getUserTxt(), this.getMdpTxt());
             if (this.userField.getText() != "") {
-                c.envoiMsg("APOP " + this.getUserTxt() + " " + this.getMdpTxt());
+                c.envoiMsg("APOP " + this.getUserTxt() + " " + this.getMdpTxt(true));
                 String reponse = c.receive("\r\n");
                 this.outputField.setText(reponse + "\n" + this.outputField.getText());
                 if (reponse.contains("+OK")) {
@@ -226,7 +229,7 @@ public class ConnexionFrame extends javax.swing.JFrame {
                     this.outputField.setText("Mot de passe erroné" + this.outputField.getText());
                 }
             }
-
+            
         } catch (IOException ex) {
             Logger.getLogger(ConnexionFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -240,6 +243,8 @@ public class ConnexionFrame extends javax.swing.JFrame {
                 String reponse = c.receive("\r\n");
                 this.outputField.setText(reponse + this.outputField.getText());
                 if (reponse.contains("+OK")) {
+                    String[] split = reponse.split(" ");
+                    this.timestamp = split[split.length-1];
                     JOptionPane.showMessageDialog(null, "Serveur atteint");
                     this.connectButton.setEnabled(true);
                 } else {
@@ -253,22 +258,33 @@ public class ConnexionFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Serveur non atteint");
         }
     }//GEN-LAST:event_testButtonActionPerformed
-
+    
     public String getServerTxt() {
         server = this.serverField.getText();
         return this.server;
     }
-
+    
     public String getUserTxt() {
         user = this.userField.getText();
         return this.user;
     }
-
-    public String getMdpTxt() {
-        mdp = new String(this.mdpField.getPassword());
+    
+    public String getMdpTxt(boolean secured) {
+        if(!secured){
+            mdp = new String(this.mdpField.getPassword());
+        } else {
+            try {
+                String pass = new String(this.mdpField.getPassword()) + timestamp;
+                System.out.println(pass);
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                mdp = new String(md.digest(pass.getBytes()));
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(ConnexionFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return this.mdp;
     }
-
+    
     /**
      * @param args the command line arguments
      */
@@ -276,8 +292,8 @@ public class ConnexionFrame extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+        */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -296,7 +312,7 @@ public class ConnexionFrame extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {

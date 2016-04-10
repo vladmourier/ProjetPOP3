@@ -5,7 +5,14 @@
 */
 package pop3.Server;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import pop3.Email;
 
 /**
@@ -36,6 +43,13 @@ public class POP3ServerMessage {
     public POP3ServerMessage(String message) {
         this.message = message;
     }
+    
+    public POP3ServerMessage getMsgServerReadyTimestamp(){
+        java.util.Date date= new java.util.Date();
+        this.message =SERVER_READY + " <" + date.getTime() + "@myPOP3server.com>";
+        return this;
+    }
+    
     public POP3ServerMessage getMsgServerInitMailbox(ArrayList<Email> mails, int size){
         this.message = "+OK CURRENT MAILBOX HAS " + mails.size() + " MESSAGES (" + size +" bytes)";
 //        this.message += "\r\n";
@@ -43,7 +57,7 @@ public class POP3ServerMessage {
 //            message += mails.indexOf(m)+1 + " " + m.getSize() + "\r\n";
 //        }
 //        message += ".";
-        return this;
+return this;
     }
     
     public POP3ServerMessage getMsgShowingEmail(Email e){

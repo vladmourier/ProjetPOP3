@@ -6,6 +6,8 @@
 package pop3.Server;
 
 import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,8 +104,8 @@ public class FileManager {
         return u;
     }
     
-    public boolean verifyPass(int id, String pass) throws IOException {
-        boolean ok = false;
+    public boolean verifyPass(int id, String pass, String timestamp) throws IOException, NoSuchAlgorithmException {
+        boolean ok = false, secured = timestamp != null;
         
         try {
             InputStream ips = new FileInputStream(user_pass);
@@ -117,10 +119,21 @@ public class FileManager {
                 if(!"".equals(line)){
                     String[] user = line.split("\t");
                     if (id == Integer.parseInt(user[2])) {
-                        if (pass.equals(user[1])) {
-                            ok = true;
+                        if(!secured){
+                            if (pass.equals(user[1])) {
+                                ok = true;
+                            }
+                            break;
+                        } else {
+                            MessageDigest md = MessageDigest.getInstance("MD5");
+                            String s = user[1] + timestamp;
+                            System.out.println(s);
+                            String r = new String(md.digest(s.getBytes()));
+                            if(pass.equals(r)){
+                                ok = true;
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }
@@ -247,7 +260,7 @@ public class FileManager {
      * ------------- NOT WORKING ----------
      * @param idu
      * @param idm
-     * @return 
+     * @return
      */
     public boolean deleteMail2(int idu, int idm) {
         boolean dele = false;

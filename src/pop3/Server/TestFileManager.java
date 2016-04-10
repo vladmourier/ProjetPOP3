@@ -26,8 +26,8 @@ public class TestFileManager {
             ArrayList<Email> MailList = new ArrayList();
             
             System.out.println("Le user Adrien a pour id : "+FM.findUserId("Adrien"));
-            System.out.println("Le pass est : "+FM.verifyPass(3, "motdepasse"));
-            System.out.println("Le pass est : "+FM.verifyPass(3, "test"));
+//            System.out.println("Le pass est : "+FM.verifyPass(3, "motdepasse"));
+//            System.out.println("Le pass est : "+FM.verifyPass(3, "test"));
             MailList = FM.getMails(1);
             System.out.println("Taille des mails = " + FM.getMailsSize(1));
             for(Email e: MailList){

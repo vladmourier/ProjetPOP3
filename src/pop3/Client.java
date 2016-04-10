@@ -89,33 +89,7 @@ public class Client extends ObjetConnecte {
                 }
             }
             System.out.println(s);
-/*
-            if (s.contains("+")) { //on vérifie si c'est un mail ou une erreur
-                while (ok != -1) {
-                    s += new String(buffer);
-                    if (s.endsWith("\r\n.\r\n")) {
-                        ok = -1;
-                    } else {
-                        ok = BIS.read(buffer);
-                    }
-                }
-            } else if (s.contains("-")) {
-                if (s.endsWith("\r\n")) {
-                    ok = -1;
-                } else {
-                    ok = BIS.read(buffer);
-                }
-                while (ok != -1) {
-                    s += new String(buffer);
-                    if (s.endsWith("\r\n")) {
-                        ok = -1;
-                    } else {
-                        ok = BIS.read(buffer);
-                    }
-                }
-            } else {
-                return "!!ERROR";
-            }*/
+
         } catch (IOException ex) {
             Logger.getLogger(ObjetConnecte.class.getName()).log(Level.SEVERE, null, ex);
         }

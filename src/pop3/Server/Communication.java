@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +33,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     private ArrayList<Email> currentMails;
     private ArrayList<Integer> markedAsDeleted;
     private String currentState;
+    private String currentSecurityTimestamp;
     public static final String ETAT_AUTORISATION = "autorisation";
     public static final String ETAT_TRANSACTION = "transaction";
     public static final String ETAT_USER_RECU = "user recu";
@@ -58,7 +60,9 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.BOS = new BufferedOutputStream(this.OS);
             this.IS = Sclient.getInputStream();
             this.BIS = new BufferedInputStream(this.IS);
-            POP3ServerMessage msg = new POP3ServerMessage(POP3ServerMessage.SERVER_READY);
+            POP3ServerMessage msg = new POP3ServerMessage();
+            msg = msg.getMsgServerReadyTimestamp();
+            setSecurityTimestamp(msg.getMessage());
             this.sendPop3ServerMessage(msg);
             currentState = ETAT_AUTORISATION;
             while(!quit_asked){
@@ -115,11 +119,13 @@ public class Communication extends ObjetConnecte implements Runnable {
     private boolean PassCommandIsValid(int userid, String received) {
         String pass = received.split(" ")[1];
         try {
-            return   fileManager.verifyPass(userid, pass);
+            return   fileManager.verifyPass(userid, pass, null);
         } catch (IOException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return false;
     }
     private boolean ApopCommandIsValid(String received) {
         int userid;
@@ -132,12 +138,14 @@ public class Communication extends ObjetConnecte implements Runnable {
         try {
             userid = fileManager.findUserId(user);
             if(userid==0) return false;
-            okPass = fileManager.verifyPass(userid, pass);
+            okPass = fileManager.verifyPass(userid, pass, currentSecurityTimestamp);
             if(okPass && okUser){
                 currentUser = new User(userid, user, pass);
                 currentMails = retrieveUserMessages();
             }
         } catch (IOException ex) {
+            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
         return okPass && okUser;
@@ -274,5 +282,10 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     public void setAddress_dest(InetAddress address_dest) {
         this.address_dest = address_dest;
+    }
+    
+    public void setSecurityTimestamp(String Pop3serverMessage){
+        String[] s = Pop3serverMessage.split(" ");
+        this.currentSecurityTimestamp = s[s.length-1];
     }
 }
