@@ -5,8 +5,16 @@
  */
 package pop3.Server;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.security.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  *
@@ -17,5 +25,7 @@ public class CommunicationSecured extends Communication {
     public CommunicationSecured(Socket client) throws SocketException {
         super(client);
     }
+    
+    
     
 }

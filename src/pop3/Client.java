@@ -12,6 +12,9 @@ import java.net.*;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import pop3.Server.CommunicationSecured;
 
 /**
  *
@@ -31,23 +34,11 @@ public class Client extends ObjetConnecte {
     public static final String ETAT_SUPPRESSION = "suppression";
     public static final String ETAT_ATTENTEQUIT = "attente du quit";
 
-    public Client(String ip) throws SocketException {
-        super();
-        try {
-            port_dest = 110;
-            ia = InetAddress.getByName(ip);
-            sServer = new Socket(ia, port_dest);
-            System.out.println("YAY!");
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
     public Client(InetAddress ia, int port) throws SocketException, IOException {
         super(ia, port);
-        this.socket = new Socket(ia, port);
+        //this.socket = new Socket(ia, port);
+        this.socket = initSSLSocket(ia, port);
         this.port_c = this.socket.getLocalPort();
         System.out.println("Socket cree port : " + port_c);
         this.IS = this.socket.getInputStream();
@@ -55,6 +46,28 @@ public class Client extends ObjetConnecte {
         this.OS = this.socket.getOutputStream();
         this.BOS = new BufferedOutputStream(OS);
         this.quit = false;
+    }
+    
+    public Socket initSSLSocket(InetAddress addressServer, int port){
+        try {
+            SSLSocketFactory sslfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            SSLSocket ss = (SSLSocket) sslfactory.createSocket(addressServer, port);
+            String[] cipherSuites = ss.getSupportedCipherSuites();
+            String[] parametres = new String[cipherSuites.length];
+            int i = 0;
+            for (String param: cipherSuites){
+                if(param.contains("anon")){
+                    parametres[i] = param;
+                    i++;
+                }
+            }
+            ss.setEnabledCipherSuites(cipherSuites);
+            return ss;
+        } catch (IOException ex) {
+            Logger.getLogger(CommunicationSecured.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
+            return null;
+        }
     }
 
     public void changementEtat(String etat) {
