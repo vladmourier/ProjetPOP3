@@ -114,8 +114,6 @@ public class FileManager {
             String line;
             
             while ((line = br.readLine()) != null) {
-                //System.out.println(line);
-                //il faut parser line entre chaque tabulation pour tester
                 if(!"".equals(line)){
                     String[] user = line.split("\t");
                     if (id == Integer.parseInt(user[2])) {
