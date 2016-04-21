@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pop3;
+package POP3_SMTP.POP3.Client;
 
+import POP3_SMTP.Email;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;

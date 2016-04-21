@@ -3,7 +3,7 @@
 * To change this template file, choose Tools | Templates
 * and open the template in the editor.
 */
-package pop3;
+package POP3_SMTP;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -25,7 +25,7 @@ public class ObjetConnecte {
     
     public String name;
     int MAX;
-    int port_c;
+    protected int port_c;
     public InetAddress ia_c;
     protected InputStream IS;
     protected OutputStream OS;

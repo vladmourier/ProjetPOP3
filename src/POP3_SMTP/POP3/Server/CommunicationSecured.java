@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pop3.Server;
+package POP3_SMTP.POP3.Server;
 
 import java.io.IOException;
 import java.net.InetAddress;

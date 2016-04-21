@@ -3,15 +3,16 @@
 * To change this template file, choose Tools | Templates
 * and open the template in the editor.
 */
-package pop3.Server;
+package POP3_SMTP;
 
+import POP3_SMTP.Email;
+import POP3_SMTP.Tools;
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import pop3.*;
 
 /**
  *

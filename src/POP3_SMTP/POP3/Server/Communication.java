@@ -3,8 +3,10 @@
 * To change this template file, choose Tools | Templates
 * and open the template in the editor.
 */
-package pop3.Server;
+package POP3_SMTP.POP3.Server;
 
+import POP3_SMTP.User;
+import POP3_SMTP.FileManager;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -15,8 +17,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import pop3.Email;
-import pop3.ObjetConnecte;
+import POP3_SMTP.Email;
+import POP3_SMTP.ObjetConnecte;
 
 /**
  *
@@ -120,9 +122,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         String pass = received.split(" ")[1];
         try {
             return   fileManager.verifyPass(userid, pass, null);
-        } catch (IOException ex) {
-            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (IOException | NoSuchAlgorithmException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
@@ -143,9 +143,7 @@ public class Communication extends ObjetConnecte implements Runnable {
                 currentUser = new User(userid, user, pass);
                 currentMails = retrieveUserMessages();
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (IOException | NoSuchAlgorithmException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
         return okPass && okUser;
