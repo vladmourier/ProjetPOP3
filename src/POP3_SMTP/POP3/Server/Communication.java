@@ -27,7 +27,6 @@ import POP3_SMTP.ObjetConnecte;
 public class Communication extends ObjetConnecte implements Runnable {
     
     public int port_dest;
-    public int port_ecoute;
     public InetAddress address_dest;
     private Socket Sclient;
     private FileManager fileManager;
