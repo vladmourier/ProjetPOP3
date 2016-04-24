@@ -32,7 +32,7 @@ public class ObjetConnecte {
     protected BufferedInputStream BIS;
     protected BufferedOutputStream BOS;
     
-    public ObjetConnecte() throws SocketException {
+    public ObjetConnecte(){
         
         this.MAX = 2000;
     }
