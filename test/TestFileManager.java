@@ -6,11 +6,8 @@
 
 
 import POP3_SMTP.FileManager;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import POP3_SMTP.Email;
+import java.util.ArrayList;
 
 /**
  *
@@ -23,23 +20,21 @@ public class TestFileManager {
      */
     public static void main(String[] args) {
         FileManager FM = new FileManager();
-        try {
-            ArrayList<Email> MailList = new ArrayList();
-            
-            System.out.println("Le user Adrien a pour id : "+FM.findUserId("Adrien"));
-//            System.out.println("Le pass est : "+FM.verifyPass(3, "motdepasse"));
-//            System.out.println("Le pass est : "+FM.verifyPass(3, "test"));
-            MailList = FM.getMails(1);
-            System.out.println("Taille des mails = " + FM.getMailsSize(1));
-            for(Email e: MailList){
-                System.out.println("Taille d'un mail = " + e.getSize());
-            }
-            
-            
-            //System.out.println(FM.deleteMail(1, 1));
-            
-        } catch (IOException ex) {
-            Logger.getLogger(TestFileManager.class.getName()).log(Level.SEVERE, null, ex);
+        Email e = new Email();
+        ArrayList<String> destinataires = new ArrayList<>();
+        destinataires.add("User");
+        destinataires.add("Toto");
+        destinataires.add("Adrien");
+        e.setExpediteur("vlad@mourier.com");
+        e.setObjet("Test de la fonction d'écriture");
+        e.setMessage("Je teste pour voir si ce message va s'écrire dans les différents fichiers ");
+        e.setDestinataires(destinataires);
+        e.setId(10);
+        
+        FM.writeMail(e);
+        
+        for(String s : FM.getUserNames()){
+            System.out.println(s);
         }
     }
 }
