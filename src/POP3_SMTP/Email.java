@@ -144,19 +144,20 @@ public class Email {
         return s;
     }
 
-    public String getTextForWriting() {
-        String dest = "" + id + "\r\n";
+    public String getTextForWriting(int idMail) {
+        String dest = "" ;
         for (String s : destinataires) {
             dest += s;
             if (destinataires.indexOf(s) != destinataires.size() - 1) {
                 dest += ",";
             }
         }
-        String s = "MAIL FROM: <" + expediteur + "> \r\n"
+        String s = idMail + "\r\n"
+                + "MAIL FROM: <" + expediteur + "> \r\n"
                 + "RCPT TO:" + dest + "\r\n"
-                + "<OBJECT>" + objet + "\r\n"
+                + "<OBJECT>" + objet + "\r\n\r\n"
                 + this.message
-                + "\r\n";
+                + "\r\n.\r\n";
         return s;
     }
 }

@@ -32,5 +32,9 @@ public class TestFileManager {
         e.setId(10);
         
         FM.writeMail(e);
+        
+        for(String s : FM.getUserNames()){
+            System.out.println(s);
+        }
     }
 }
