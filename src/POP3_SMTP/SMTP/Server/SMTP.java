@@ -27,6 +27,5 @@ public class SMTP {
         } catch (IOException ex) {
             Logger.getLogger(SMTP.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    
+    } 
 }
