@@ -38,8 +38,8 @@ public class Client extends ObjetConnecte {
 
     public Client(InetAddress ia, int port) throws SocketException, IOException {
         super(ia, port);
-        //this.socket = new Socket(ia, port);
-        this.socket = initSSLSocket(ia, port);
+        this.socket = new Socket(ia, port);
+//        this.socket = initSSLSocket(ia, port);
         this.port_c = this.socket.getLocalPort();
         System.out.println("Socket cree port : " + port_c);
         this.IS = this.socket.getInputStream();
@@ -125,6 +125,9 @@ public class Client extends ObjetConnecte {
                 } else if (s.contains("-ERR") && s.endsWith("\r\n")) {
                     ok = -1;
                 } else {*/
+                if(s.endsWith("ready")){
+                    System.out.println("BREAKPOINT");
+                }
                     ok = BIS.read(buffer);
                 //}
             }

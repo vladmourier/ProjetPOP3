@@ -29,7 +29,7 @@ public class Serveur {
         while (true) {
             try {
                 Socket Sclient = this.socketServer.accept();
-                new Thread(new POP3_SMTP.SMTP.Server.Communication(Sclient)).start();
+                new Thread(new Communication(Sclient)).start();
             } catch (IOException ex) {
                 Logger.getLogger(POP3.class.getName()).log(Level.SEVERE, null, ex);
             }

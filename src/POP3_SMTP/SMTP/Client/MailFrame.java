@@ -285,7 +285,7 @@ public class MailFrame extends javax.swing.JFrame {
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         try {
             //c = new Client(InetAddress.getLocalHost(), 110);
-            c = new Client(InetAddress.getByName("134.214.119.125"), 25000);
+            c = new Client(InetAddress.getByName("localhost"), 25000);
             //Init client -------------------------------------------------------------
             if("".equals(expediteurField.getText())) {
                 JOptionPane.showMessageDialog(null, "Veuillez remplir le champs d'expéditeur.");
