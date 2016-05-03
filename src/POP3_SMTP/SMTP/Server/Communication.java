@@ -104,11 +104,13 @@ public class Communication extends ObjetConnecte implements Runnable {
             //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
         } else {
             this.sendMessage(503, "bad sequence of command");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
         }
     }
 
     public void manageAttenteMailoState(String received) {
-        if (received.startsWith("MAIL FROM:<")) {
+        if (received.startsWith("MAIL")) {
             sender = received.split("<")[1].split(">")[0];
             this.sendMessage(250, "sender ok");
         } else if (received.startsWith("QUIT")) {
@@ -117,29 +119,67 @@ public class Communication extends ObjetConnecte implements Runnable {
         } else if (received.startsWith("RSET")) {
             this.sendMessage(250, "Reseted");
             //NETTOYER sender, receivers, object, data
-        }
-        else {
+            //retourner dans attente mail
+        } else {
             this.sendMessage(503, "bad sequence of command");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
         }
     }
 
     public void manageAttenteRcptState(String received) {
-        if (received.startsWith("RCPT TO:<")) {
+        if (received.startsWith("RCPT")) {
             String temp = received.split("<")[1].split(">")[0];
-            if (fileManager.getUserNames().contains(temp)){
-            receivers[receivers.length] = temp;
+            if (fileManager.getUserNames().contains(temp)) {
+                receivers[receivers.length] = temp;
                 this.sendMessage(250, "receiver ok");
+            } else {
+                this.sendMessage(550, "no such user");
             }
-            else{
-                
-            }
+        } else if (received.startsWith("QUIT")) {
+            this.sendMessage(221, "Connexion closed");
+            //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
+        } else if (received.startsWith("RSET")) {
+            this.sendMessage(250, "Reseted");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+        } else {
+            this.sendMessage(503, "bad sequence of command");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
         }
     }
 
     public void manageAttenteDataState(String received) {
+        if (received.startsWith("RCPT")) {
+            String temp = received.split("<")[1].split(">")[0];
+            if (fileManager.getUserNames().contains(temp)) {
+                receivers[receivers.length] = temp;
+                this.sendMessage(250, "receiver ok");
+            } else {
+                this.sendMessage(550, "no such user");
+            }
+        } else if (received.startsWith("DATA")){
+            this.sendMessage(354, "Enter mail, end with \".\" on a line by itself");
+        }
+        else if (received.startsWith("QUIT")) {
+            this.sendMessage(221, "Connexion closed");
+            //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
+        } else if (received.startsWith("RSET")) {
+            this.sendMessage(250, "Reseted");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+        } else {
+            this.sendMessage(503, "bad sequence of command");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+        }
     }
 
     public void manageAttenteContentState(String received) {
+        //gestion du corps du mail = galère !!
+        //quand on reçoit le point -> créer un nouvel objet mail, tout mettre dedans
+        //puis appeler le filManager pour tout stocker dans les fichiers proprement
     }
 
     /**
