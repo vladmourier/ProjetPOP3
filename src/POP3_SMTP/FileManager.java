@@ -23,6 +23,9 @@ public class FileManager {
 
     final String user_pass = "User_Pass.txt";
 
+    /*
+     * Ecris le mail dans les fichiers de chaque utilisateur destinataire
+     */
     public boolean writeMail(Email e) {
         boolean a = true;
         for (String dest : e.getDestinataires()) {
@@ -32,7 +35,6 @@ public class FileManager {
                 int id = mails.size() + 1;
                 String Path = current.getId() + ".txt";
                 String txt = e.getTextForWriting(id);
-                System.out.println("idMail = " + id);
                 Files.write(Paths.get(Path), txt.getBytes(), StandardOpenOption.APPEND);
             } catch (IOException ex) {
                 a = false;
@@ -42,6 +44,10 @@ public class FileManager {
         return a;
     }
 
+    /**
+     * Renvoie la liste des noms d'utilisateurs
+     * @return 
+     */
     public ArrayList<String> getUserNames() {
         InputStream ips = null;
         ArrayList<String> Names = new ArrayList<>();
@@ -70,6 +76,12 @@ public class FileManager {
         return Names;
     }
 
+    /**
+     * Renvoie l'id d'un utilisateur en fonction de son nom
+     * @param usr
+     * @return
+     * @throws IOException 
+     */
     public int findUserId(String usr) throws IOException {
         int id = 0;
 
@@ -95,6 +107,11 @@ public class FileManager {
         return id;
     }
 
+    /**
+     * Retrouve un utilisateur à partir de son nom
+     * @param usr
+     * @return 
+     */
     public User retrieveUser(String usr) {
         User u = new User();
 
@@ -124,6 +141,11 @@ public class FileManager {
         return u;
     }
 
+    /**
+     * Retrouve un utilisateur à partir de son id;
+     * @param usr
+     * @return 
+     */
     public User retrieveUser(int usr) {
         User u = new User();
 
@@ -153,6 +175,15 @@ public class FileManager {
         return u;
     }
 
+    /**
+     * Vérifie que le mot de passe donné correspond bien au MDP de l'utilisateur
+     * @param id
+     * @param pass
+     * @param timestamp
+     * @return
+     * @throws IOException
+     * @throws NoSuchAlgorithmException 
+     */
     public boolean verifyPass(int id, String pass, String timestamp) throws IOException, NoSuchAlgorithmException {
         boolean ok = false, secured = timestamp != null;
 
@@ -191,6 +222,11 @@ public class FileManager {
         return ok;
     }
 
+    /**
+     * Renvoie la taille en bytes des mails de l'utilisateur désigné par l'id donné
+     * @param idu
+     * @return 
+     */
     public long getMailsSize(int idu) {
         File f = new File(idu + ".txt");
         ArrayList<Email> mails = getMails(idu);
@@ -205,6 +241,11 @@ public class FileManager {
         return f.length() - (mails.size() * "\\r\\n\\r\\n".getBytes().length) - Ids_size;
     }
 
+    /**
+     * Renvoie une liste des mails de l'utilisateur désigné par l'id donné
+     * @param idu
+     * @return 
+     */
     public ArrayList<Email> getMails(int idu) {
         ArrayList<Email> mailList = new ArrayList();
         try {
@@ -248,6 +289,12 @@ public class FileManager {
         return mailList;
     }
 
+    /**
+     * Supprime le mail donné de la boite de l'user donné
+     * @param idu
+     * @param idm
+     * @return 
+     */
     public boolean deleteMail(int idu, int idm) {
         boolean deleted = false;
         File f = new File(idu + ".txt");

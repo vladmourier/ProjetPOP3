@@ -5,7 +5,6 @@
  */
 package POP3_SMTP.SMTP.Server;
 
-import POP3_SMTP.POP3.Server.CommunicationSecured;
 import POP3_SMTP.POP3.Server.POP3;
 import java.io.IOException;
 import java.net.ServerSocket;

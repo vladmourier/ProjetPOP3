@@ -7,15 +7,12 @@ package POP3_SMTP.SMTP.Server;
 
 import POP3_SMTP.FileManager;
 import POP3_SMTP.ObjetConnecte;
-import static POP3_SMTP.POP3.Server.Communication.ETAT_AUTORISATION;
-import POP3_SMTP.POP3.Server.POP3ServerMessage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
