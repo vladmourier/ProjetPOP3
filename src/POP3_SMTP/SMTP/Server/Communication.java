@@ -68,16 +68,16 @@ public class Communication extends ObjetConnecte implements Runnable {
                 received = new String(buffer);
                 switch (currentState) {
                     case ETAT_ATTENTE_EHLO:
-                        manageAttenteEhloState(received);
+                        quit_asked = manageAttenteEhloState(received);
                         break;
                     case ETAT_ATTENTE_MAIL:
-                        manageAttenteMailoState(received);
+                        quit_asked = manageAttenteMailoState(received);
                         break;
                     case ETAT_ATTENTE_RCPT:
-                        manageAttenteRcptState(received);
+                        quit_asked = manageAttenteRcptState(received);
                         break;
                     case ETAT_ATTENTE_DATA:
-                        manageAttenteDataState(received);
+                        quit_asked = manageAttenteDataState(received);
                         break;
                     case ETAT_ATTENTE_CONTENT:
                         break;
@@ -88,30 +88,31 @@ public class Communication extends ObjetConnecte implements Runnable {
         }
     }
 
-    public void manageAttenteEhloState(String received) {
+    public boolean manageAttenteEhloState(String received) {
         if (received.startsWith("EHLO")) {
             this.sendMessage(250, "OK");
             currentState = ETAT_ATTENTE_MAIL;
         } else if (received.startsWith("QUIT")) {
             this.sendMessage(221, "Connexion closed");
-            //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
+            return true;
         } else {
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
             clearContext();
-                        this.sendMessage(503, "bad sequence of command");
+            this.sendMessage(503, "bad sequence of command");
         }
+        return false;
     }
 
-    public void manageAttenteMailoState(String received) {
+    public boolean manageAttenteMailoState(String received) {
         if (received.startsWith("MAIL")) {
             mail.setExpediteur(received.split("<")[1].split(">")[0]);
             this.sendMessage(250, "sender ok");
         } else if (received.startsWith("QUIT")) {
             //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
             this.sendMessage(221, "Connexion closed");
+            return true;
         } else if (received.startsWith("RSET")) {
-            mail = new Email();
             this.sendMessage(250, "Reseted");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
@@ -120,12 +121,13 @@ public class Communication extends ObjetConnecte implements Runnable {
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
             clearContext();
-                        this.sendMessage(503, "bad sequence of command");
+            this.sendMessage(503, "bad sequence of command");
 
         }
+        return false;
     }
 
-    public void manageAttenteRcptState(String received) {
+    public boolean manageAttenteRcptState(String received) {
         if (received.startsWith("RCPT")) {
             String temp = received.split("<")[1].split(">")[0];
             if (fileManager.getUserNames().contains(temp)) {
@@ -136,7 +138,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             }
         } else if (received.startsWith("QUIT")) {
             this.sendMessage(221, "Connexion closed");
-            //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
+            return true;
         } else if (received.startsWith("RSET")) {
             mail = new Email();
             currentState = ETAT_ATTENTE_MAIL;
@@ -150,9 +152,10 @@ public class Communication extends ObjetConnecte implements Runnable {
             clearContext();
             this.sendMessage(503, "bad sequence of command");
         }
+        return false;
     }
 
-    public void manageAttenteDataState(String received) {
+    public boolean manageAttenteDataState(String received) {
         if (received.startsWith("RCPT")) {
             String temp = received.split("<")[1].split(">")[0];
             if (fileManager.getUserNames().contains(temp)) {
@@ -165,7 +168,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.sendMessage(354, "Enter mail, end with \".\" on a line by itself");
         } else if (received.startsWith("QUIT")) {
             this.sendMessage(221, "Connexion closed");
-            //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
+            return true;
         } else if (received.startsWith("RSET")) {
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
@@ -177,9 +180,10 @@ public class Communication extends ObjetConnecte implements Runnable {
             clearContext();
             this.sendMessage(503, "bad sequence of command");
         }
+        return false;
     }
 
-    public void manageAttenteContentState(String received) {
+    public boolean manageAttenteContentState(String received) {
         if (received.startsWith("<OBJECT>")) {
             mail.setObjet(received.split(">")[1].split("\r\n")[0]);
             String[] corps = received.split("\r\n");
@@ -192,7 +196,10 @@ public class Communication extends ObjetConnecte implements Runnable {
                     }
                 }
             }
-        } else {
+        } else if (received.startsWith("QUIT")){
+            sendMessage(250, "server is disconnecting");
+            return true;
+        }else {
             mail.setObjet("sans objet");
             String[] corps = received.split("\r\n");
             for (int i = 2; i < corps.length; i++) {
@@ -207,6 +214,8 @@ public class Communication extends ObjetConnecte implements Runnable {
         }
         
         //APPEL AU FILEMANAGER POUR STOCKER LE MAIL
+        fileManager.writeMail(mail);
+        return false;
     }
 
     /**
@@ -225,8 +234,8 @@ public class Communication extends ObjetConnecte implements Runnable {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void clearContext(){
+
+    public void clearContext() {
         this.mail = new Email();
         currentState = ETAT_ATTENTE_MAIL;
     }
