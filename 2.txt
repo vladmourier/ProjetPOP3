@@ -12,3 +12,44 @@ RCPT TO:Toto
 
 Corps du mail 2, user 2
 .
+4
+MAIL FROM: <vlad@mourier.com> 
+RCPT TO:User,Toto,Adrien
+<OBJECT>Test de la fonction d'écriture
+Je teste pour voir si ce message va s'écrire dans les différents fichiers 
+.
+1
+MAIL FROM: <vlad@mourier.com> 
+RCPT TO:User,Toto,Adrien
+<OBJECT>Test de la fonction d'écriture
+
+Je teste pour voir si ce message va s'écrire dans les différents fichiers 
+.
+1
+MAIL FROM: <vlad@mourier.com> 
+RCPT TO:User,Toto,Adrien
+<OBJECT>Test de la fonction d'écriture
+
+Je teste pour voir si ce message va s'écrire dans les différents fichiers 
+.
+1
+MAIL FROM: <vlad@mourier.com> 
+RCPT TO:User,Toto,Adrien
+<OBJECT>Test de la fonction d'écriture
+
+Je teste pour voir si ce message va s'écrire dans les différents fichiers 
+.
+1
+MAIL FROM: <vlad@mourier.com> 
+RCPT TO:User,Toto,Adrien
+<OBJECT>Test de la fonction d'écriture
+
+Je teste pour voir si ce message va s'écrire dans les différents fichiers 
+.
+8
+MAIL FROM: <vlad@mourier.com> 
+RCPT TO:User,Toto,Adrien
+<OBJECT>Test de la fonction d'écriture
+
+Je teste pour voir si ce message va s'écrire dans les différents fichiers 
+.

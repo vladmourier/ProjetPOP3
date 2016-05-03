@@ -35,8 +35,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     private static final String ETAT_ATTENTE_DATA = "attente data";
     private static final String ETAT_ATTENTE_CONTENT = "attente contenu";
 
-    private String sender;
-    private String[] receivers;
+    private Email mail;
 
     public Communication(Socket client) throws SocketException {
         super();
@@ -44,6 +43,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         this.Sclient = client;
         this.address_dest = client.getInetAddress();
         fileManager = new FileManager();
+        mail = new Email();
         currentState = ETAT_INITIALISATION;
         try {
             this.OS = Sclient.getOutputStream();
@@ -101,30 +101,32 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.sendMessage(221, "Connexion closed");
             //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
         } else {
-            this.sendMessage(503, "bad sequence of command");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
             clearContext();
+                        this.sendMessage(503, "bad sequence of command");
         }
     }
 
     public void manageAttenteMailoState(String received) {
         if (received.startsWith("MAIL")) {
-            sender = received.split("<")[1].split(">")[0];
+            mail.setExpediteur(received.split("<")[1].split(">")[0]);
             this.sendMessage(250, "sender ok");
         } else if (received.startsWith("QUIT")) {
-            this.sendMessage(221, "Connexion closed");
             //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
+            this.sendMessage(221, "Connexion closed");
         } else if (received.startsWith("RSET")) {
+            mail = new Email();
             this.sendMessage(250, "Reseted");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
             clearContext();
         } else {
-            this.sendMessage(503, "bad sequence of command");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
             clearContext();
+                        this.sendMessage(503, "bad sequence of command");
+
         }
     }
 
@@ -132,7 +134,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         if (received.startsWith("RCPT")) {
             String temp = received.split("<")[1].split(">")[0];
             if (fileManager.getUserNames().contains(temp)) {
-                receivers[receivers.length] = temp;
+                mail.addDestinataire(temp);
                 this.sendMessage(250, "receiver ok");
             } else {
                 this.sendMessage(550, "no such user");
@@ -141,15 +143,17 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.sendMessage(221, "Connexion closed");
             //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
         } else if (received.startsWith("RSET")) {
-            this.sendMessage(250, "Reseted");
+            mail = new Email();
+            currentState = ETAT_ATTENTE_MAIL;
             //NETTOYER sender, receivers, object, data
             //retourner dans attente 
             clearContext();
+            this.sendMessage(250, "Reseted");
         } else {
-            this.sendMessage(503, "bad sequence of command");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
             clearContext();
+            this.sendMessage(503, "bad sequence of command");
         }
     }
 
@@ -157,27 +161,26 @@ public class Communication extends ObjetConnecte implements Runnable {
         if (received.startsWith("RCPT")) {
             String temp = received.split("<")[1].split(">")[0];
             if (fileManager.getUserNames().contains(temp)) {
-                receivers[receivers.length] = temp;
+                mail.addDestinataire(temp);
                 this.sendMessage(250, "receiver ok");
             } else {
                 this.sendMessage(550, "no such user");
             }
-        } else if (received.startsWith("DATA")){
+        } else if (received.startsWith("DATA")) {
             this.sendMessage(354, "Enter mail, end with \".\" on a line by itself");
-        }
-        else if (received.startsWith("QUIT")) {
+        } else if (received.startsWith("QUIT")) {
             this.sendMessage(221, "Connexion closed");
             //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
         } else if (received.startsWith("RSET")) {
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+            clearContext();
             this.sendMessage(250, "Reseted");
-            //NETTOYER sender, receivers, object, data
-            //retourner dans attente mail
-            clearContext();
         } else {
-            this.sendMessage(503, "bad sequence of command");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
             clearContext();
+            this.sendMessage(503, "bad sequence of command");
         }
     }
 
