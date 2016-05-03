@@ -5,6 +5,7 @@
  */
 package POP3_SMTP.SMTP.Server;
 
+import POP3_SMTP.Email;
 import POP3_SMTP.FileManager;
 import POP3_SMTP.ObjetConnecte;
 import java.io.BufferedInputStream;
@@ -103,6 +104,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.sendMessage(503, "bad sequence of command");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
+            clearContext();
         }
     }
 
@@ -117,10 +119,12 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.sendMessage(250, "Reseted");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
+            clearContext();
         } else {
             this.sendMessage(503, "bad sequence of command");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
+            clearContext();
         }
     }
 
@@ -139,11 +143,13 @@ public class Communication extends ObjetConnecte implements Runnable {
         } else if (received.startsWith("RSET")) {
             this.sendMessage(250, "Reseted");
             //NETTOYER sender, receivers, object, data
-            //retourner dans attente mail
+            //retourner dans attente 
+            clearContext();
         } else {
             this.sendMessage(503, "bad sequence of command");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
+            clearContext();
         }
     }
 
@@ -166,10 +172,12 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.sendMessage(250, "Reseted");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
+            clearContext();
         } else {
             this.sendMessage(503, "bad sequence of command");
             //NETTOYER sender, receivers, object, data
             //retourner dans attente mail
+            clearContext();
         }
     }
 
@@ -194,5 +202,10 @@ public class Communication extends ObjetConnecte implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void clearContext(){
+        this.mail = new Email();
+        currentState = ETAT_ATTENTE_MAIL;
     }
 }
