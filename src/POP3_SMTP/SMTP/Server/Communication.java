@@ -1,8 +1,8 @@
- /*
-  * To change this license header, choose License Headers in Project Properties.
-  * To change this template file, choose Tools | Templates
-  * and open the template in the editor.
-  */
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package POP3_SMTP.SMTP.Server;
 
 import POP3_SMTP.Email;
@@ -61,13 +61,10 @@ public class Communication extends ObjetConnecte implements Runnable {
         String received = "";
         boolean quit_asked = false;
         this.sendMessage(220, "SMTP service ready");
-        try {
-            BIS.read(buffer);
-        } catch (IOException ex) {
-            Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
-        }
         currentState = ETAT_ATTENTE_EHLO;
+        try{
         while (!quit_asked) {
+            BIS.read(buffer);
             received = new String(buffer);
             switch (currentState) {
                 case ETAT_ATTENTE_EHLO:
@@ -85,6 +82,9 @@ public class Communication extends ObjetConnecte implements Runnable {
                 case ETAT_ATTENTE_CONTENT:
                     break;
             }
+        }
+        } catch(IOException exception){
+            exception.printStackTrace();
         }
     }
     
@@ -108,6 +108,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         if (received.startsWith("MAIL")) {
             mail.setExpediteur(received.split("<")[1].split(">")[0]);
             this.sendMessage(250, "sender ok");
+            currentState = ETAT_ATTENTE_RCPT;
         } else if (received.startsWith("QUIT")) {
             //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
             this.sendMessage(221, "Connexion closed");
@@ -133,6 +134,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             if (fileManager.getUserNames().contains(temp)) {
                 mail.addDestinataire(temp);
                 this.sendMessage(250, "receiver ok");
+                currentState = ETAT_ATTENTE_DATA;
             } else {
                 this.sendMessage(550, "no such user");
             }
@@ -166,6 +168,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             }
         } else if (received.startsWith("DATA")) {
             this.sendMessage(354, "Enter mail, end with \".\" on a line by itself");
+            currentState = ETAT_ATTENTE_CONTENT;
         } else if (received.startsWith("QUIT")) {
             this.sendMessage(221, "Connexion closed");
             return true;
@@ -230,7 +233,6 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.BOS = new BufferedOutputStream(this.OS);
             String mess = errorCode + " " + message + "\r\n";
             this.BOS.write(mess.getBytes());
-            this.BOS.write(-1);
             this.BOS.flush();
             System.out.println("J'envoie : " + mess);
         } catch (IOException ex) {

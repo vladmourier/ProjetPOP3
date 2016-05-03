@@ -1,7 +1,7 @@
 /*
-* To change this license header, choose License Headers in Project Properties.
-* To change this template file, choose Tools | Templates
-* and open the template in the editor.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package POP3_SMTP.SMTP.Client;
 
@@ -35,7 +35,6 @@ public class Client extends ObjetConnecte {
     public static final String ETAT_SUPPRESSION = "suppression";
     public static final String ETAT_ATTENTEQUIT = "attente du quit";
 
-
     public Client(InetAddress ia, int port) throws SocketException, IOException {
         super(ia, port);
         this.socket = new Socket(ia, port);
@@ -48,16 +47,16 @@ public class Client extends ObjetConnecte {
         this.BOS = new BufferedOutputStream(OS);
         this.quit = false;
     }
-    
-    public Socket initSSLSocket(InetAddress addressServer, int port){
+
+    public Socket initSSLSocket(InetAddress addressServer, int port) {
         try {
             SSLSocketFactory sslfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
             SSLSocket ss = (SSLSocket) sslfactory.createSocket(addressServer, port);
             String[] cipherSuites = ss.getSupportedCipherSuites();
             String[] parametres = new String[cipherSuites.length];
             int i = 0;
-            for (String param: cipherSuites){
-                if(param.contains("anon")){
+            for (String param : cipherSuites) {
+                if (param.contains("anon")) {
                     parametres[i] = param;
                     i++;
                 }
@@ -110,9 +109,8 @@ public class Client extends ObjetConnecte {
 
         return s;
     }
-    
-    
-    public String receiveResponse(){
+
+    public String receiveResponse() {
         byte[] buffer = new byte[1];
         String s = "";
         int ok;
@@ -120,15 +118,14 @@ public class Client extends ObjetConnecte {
             ok = BIS.read(buffer);
             while (ok != -1) {
                 s += new String(buffer);
-                /*if (s.contains("+OK") && s.endsWith("\r\n.\r\n")) {
+                /* if (s.contains("+OK") && s.endsWith("\r\n.\r\n")) { ok = -1;
+                 * } else if (s.contains("-ERR") && s.endsWith("\r\n")) { ok =
+                 * -1; } else { */
+                if (s.endsWith("\r\n")) {
                     ok = -1;
-                } else if (s.contains("-ERR") && s.endsWith("\r\n")) {
-                    ok = -1;
-                } else {*/
-                if(s.endsWith("ready")){
-                    System.out.println("BREAKPOINT");
-                }
+                } else {
                     ok = BIS.read(buffer);
+                }
                 //}
             }
             System.out.println(s);
