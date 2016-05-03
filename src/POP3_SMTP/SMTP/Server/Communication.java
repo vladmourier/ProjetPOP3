@@ -96,7 +96,10 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.sendMessage(221, "Connexion closed");
             //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
         } else {
-            this.sendMessage(503, "bad sequence of command : expected EHLO");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+            clearContext();
+                        this.sendMessage(503, "bad sequence of command");
         }
     }
 
@@ -110,9 +113,15 @@ public class Communication extends ObjetConnecte implements Runnable {
         } else if (received.startsWith("RSET")) {
             mail = new Email();
             this.sendMessage(250, "Reseted");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+            clearContext();
         } else {
-            mail = new Email();
-            this.sendMessage(503, "bad sequence of command : expected MAIL TO");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+            clearContext();
+                        this.sendMessage(503, "bad sequence of command");
+
         }
     }
 
@@ -131,11 +140,15 @@ public class Communication extends ObjetConnecte implements Runnable {
         } else if (received.startsWith("RSET")) {
             mail = new Email();
             currentState = ETAT_ATTENTE_MAIL;
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente 
+            clearContext();
             this.sendMessage(250, "Reseted");
         } else {
-            mail = new Email();
-            currentState = ETAT_ATTENTE_MAIL;
-            this.sendMessage(503, "bad sequence of command : expected RCPT TO");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+            clearContext();
+            this.sendMessage(503, "bad sequence of command");
         }
     }
 
@@ -154,13 +167,15 @@ public class Communication extends ObjetConnecte implements Runnable {
             this.sendMessage(221, "Connexion closed");
             //TODO FERMER LE SERVEUR : FAIRE UNE METHODE POUR TOUT CLOSE PROPREMENT
         } else if (received.startsWith("RSET")) {
-            mail = new Email();
-            currentState = ETAT_ATTENTE_MAIL;
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+            clearContext();
             this.sendMessage(250, "Reseted");
         } else {
-            mail = new Email();
-            currentState = ETAT_ATTENTE_MAIL;
-            this.sendMessage(503, "bad sequence of command : expected DATA or RCPT TO");
+            //NETTOYER sender, receivers, object, data
+            //retourner dans attente mail
+            clearContext();
+            this.sendMessage(503, "bad sequence of command");
         }
     }
 
@@ -209,5 +224,10 @@ public class Communication extends ObjetConnecte implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void clearContext(){
+        this.mail = new Email();
+        currentState = ETAT_ATTENTE_MAIL;
     }
 }
