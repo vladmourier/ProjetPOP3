@@ -34,7 +34,6 @@ public class Communication extends ObjetConnecte implements Runnable {
     private static final String ETAT_ATTENTE_RCPT = "attente rcpt";
     private static final String ETAT_ATTENTE_DATA = "attente data";
     private static final String ETAT_ATTENTE_CONTENT = "attente contenu";
-
     private Email mail;
 
     public Communication(Socket client) throws SocketException {
@@ -61,11 +60,10 @@ public class Communication extends ObjetConnecte implements Runnable {
         byte[] buffer = new byte[256];
         String received = "";
         boolean quit_asked = false;
+        this.sendMessage(220, "SMTP service ready");
+        currentState = ETAT_ATTENTE_EHLO;
         while (!quit_asked) {
             try {
-                this.sendMessage(220, "SMTP service ready");
-                currentState = ETAT_ATTENTE_EHLO;
-
                 BIS.read(buffer);
                 received = new String(buffer);
                 switch (currentState) {
@@ -186,9 +184,37 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
 
     public boolean manageAttenteContentState(String received) {
-        //gestion du corps du mail = galère !!
-        //quand on reçoit le point -> créer un nouvel objet mail, tout mettre dedans
-        //puis appeler le filManager pour tout stocker dans les fichiers proprement
+        if (received.startsWith("<OBJECT>")) {
+            mail.setObjet(received.split(">")[1].split("\r\n")[0]);
+            String[] corps = received.split("\r\n");
+            for (int i = 2; i < corps.length; i++) {
+                if (!corps[i].equals(".")) {
+                    if (mail.getMessage().length() != 0) {
+                        mail.setMessage(mail.getMessage() + "\r\n" + corps[i]);
+                    } else {
+                        mail.setMessage(corps[i]);
+                    }
+                }
+            }
+        } else if (received.startsWith("QUIT")){
+            sendMessage(250, "server is disconnecting");
+            return true;
+        }else {
+            mail.setObjet("sans objet");
+            String[] corps = received.split("\r\n");
+            for (int i = 2; i < corps.length; i++) {
+                if (!corps[i].equals(".")) {
+                    if (mail.getMessage().length() != 0) {
+                        mail.setMessage(mail.getMessage() + "\r\n" + corps[i]);
+                    } else {
+                        mail.setMessage(corps[i]);
+                    }
+                }
+            }
+        }
+        
+        //APPEL AU FILEMANAGER POUR STOCKER LE MAIL
+        fileManager.writeMail(mail);
         return false;
     }
 
@@ -203,7 +229,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             String mess = errorCode + " " + message + "\r\n";;
             this.BOS.write(mess.getBytes());
             this.BOS.flush();
-            System.out.print("J'envoie : " + mess);
+            System.out.println("J'envoie : " + mess);
         } catch (IOException ex) {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
