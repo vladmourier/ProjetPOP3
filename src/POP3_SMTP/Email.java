@@ -24,7 +24,11 @@ public class Email {
     private String message;
 
     public Email() {
+        id = -1;
         destinataires = new ArrayList<>();
+        expediteur = "";
+        objet = "";
+        message = "";
     }
 
     public Email(int id, String expediteur, ArrayList<String> destinataires, String objet, String message) {

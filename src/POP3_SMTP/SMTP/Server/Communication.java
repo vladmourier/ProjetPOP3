@@ -80,6 +80,7 @@ public class Communication extends ObjetConnecte implements Runnable {
                     quit_asked = manageAttenteDataState(received);
                     break;
                 case ETAT_ATTENTE_CONTENT:
+                    quit_asked = manageAttenteContentState(received);
                     break;
             }
         }
@@ -188,12 +189,12 @@ public class Communication extends ObjetConnecte implements Runnable {
     
     public boolean manageAttenteContentState(String received) {
         if (received.startsWith("<OBJECT>")) {
-            mail.setObjet(received.split(">")[1].split("\r\n")[0]);
-            String[] corps = received.split("\r\n");
+            mail.setObjet(received.split(">")[1].split("\n")[0]);
+            String[] corps = received.split("\n");
             for (int i = 2; i < corps.length; i++) {
                 if (!corps[i].equals(".")) {
                     if (mail.getMessage().length() != 0) {
-                        mail.setMessage(mail.getMessage() + "\r\n" + corps[i]);
+                        mail.setMessage(mail.getMessage() + "\n" + corps[i]);
                     } else {
                         mail.setMessage(corps[i]);
                     }
@@ -204,11 +205,11 @@ public class Communication extends ObjetConnecte implements Runnable {
             return true;
         } else {
             mail.setObjet("sans objet");
-            String[] corps = received.split("\r\n");
+            String[] corps = received.split("\n");
             for (int i = 2; i < corps.length; i++) {
                 if (!corps[i].equals(".")) {
                     if (mail.getMessage().length() != 0) {
-                        mail.setMessage(mail.getMessage() + "\r\n" + corps[i]);
+                        mail.setMessage(mail.getMessage() + "\n" + corps[i]);
                     } else {
                         mail.setMessage(corps[i]);
                     }
@@ -239,9 +240,13 @@ public class Communication extends ObjetConnecte implements Runnable {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+        
     public void clearContext() {
         this.mail = new Email();
         currentState = ETAT_ATTENTE_MAIL;
+    }
+    
+    public Email parseMailStringToEmail(String s){
+        return null;
     }
 }

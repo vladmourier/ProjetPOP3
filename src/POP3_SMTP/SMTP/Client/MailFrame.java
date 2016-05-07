@@ -27,23 +27,11 @@ public class MailFrame extends javax.swing.JFrame {
      */
     public MailFrame() {
         //c = new Client(InetAddress.getLocalHost(), 110);
-        /*Timer timer = new Timer();
-        String point = ".";
-        TimerTask task = new TimerTask() {
-        public void run()
-        {
-            switch (point) {
-			case ".": point="..";
-			break;
-			case "..": point="...";
-			break;
-			case "...": point=".";
-			break;
-			default: point=".";
-			break;
-			}
-        }
-        timer.schedule( task, 0L ,1000L);*/
+        /* Timer timer = new Timer(); String point = "."; TimerTask task = new
+         * TimerTask() { public void run() { switch (point) { case ".":
+         * point=".."; break; case "..": point="..."; break; case "...":
+         * point="."; break; default: point="."; break; } } timer.schedule(
+         * task, 0L ,1000L); */
         initComponents();
         patienterLabel.setVisible(false);
         envoiButton.setEnabled(false);
@@ -204,7 +192,7 @@ public class MailFrame extends javax.swing.JFrame {
     private void envoiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoiButtonActionPerformed
         patienterLabel.setVisible(true);
         try {
-            if("".equals(destinataireField.getText())) {
+            if ("".equals(destinataireField.getText())) {
                 JOptionPane.showMessageDialog(null, "Veuillez remplir le champs de destinataire.");
                 patienterLabel.setVisible(false);
                 return;
@@ -213,24 +201,24 @@ public class MailFrame extends javax.swing.JFrame {
             //Envoi du MAIL FROM
             c.envoiMsg("MAIL FROM:<" + expediteurField.getText() + ">"); //Envoi MAIL FROM
             String s = c.receiveResponse();
-            if (!s.startsWith("250")){
+            if (!s.startsWith("250")) {
                 JOptionPane.showMessageDialog(null, "Expediteur error:\n" + s);
                 c.envoiMsg("RSET");
                 c.receiveResponse();
                 patienterLabel.setVisible(false);
                 return;
             }
-            
+
             //Envoi des RCPT TO
             //Si aucun rcpt to ne recoit 250 OK, la connexion est terminée
             String[] destinataires = destinataireField.getText().split("; ");
             boolean destValide = false;
-            for (String dest: destinataires){
+            for (String dest : destinataires) {
                 c.envoiMsg("RCPT TO:<" + dest + ">");
                 s = c.receiveResponse();
                 destValide = destValide || (s.startsWith("250")); //au moins 1 destinataire valide.
             }
-            if (!destValide){
+            if (!destValide) {
                 JOptionPane.showMessageDialog(null, "No valid expeditor\nConnexion aborted");
                 c.envoiMsg("RSET");//reset
                 c.receiveResponse();
@@ -240,12 +228,12 @@ public class MailFrame extends javax.swing.JFrame {
                 envoiButton.setEnabled(false);
                 return;
             }
-            
+
             //Recepteurs valides, envoi du DATA
             String[] data = mailField.getText().split("\n");
             c.envoiMsg("DATA");
             s = c.receiveResponse();
-            if(!s.startsWith("354")){
+            if (!s.startsWith("354")) {
                 JOptionPane.showMessageDialog(null, "Data not valid\nConnexion aborted");
                 c.envoiMsg("QUIT");//Deconnexion du client
                 c.receiveResponse();
@@ -255,16 +243,22 @@ public class MailFrame extends javax.swing.JFrame {
             }
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Date date = new Date();
-            c.envoiMsg("Date : " + dateFormat.format(date));
-            c.envoiMsg("From : " + expediteurField.getText());
-            c.envoiMsg("To : " + destinataireField.getText());
-            c.envoiMsg("Objet : " + objetField.getText());
-            for(String line: data){
-                c.envoiMsg(line);
-            }
-            c.envoiMsg("\r\n.\r\n");
+            String str = "";
+            str += "Date : " + dateFormat.format(date) + "\n";
+            str += "From : " + expediteurField.getText() + "\n";
+            str += "To : " + destinataireField.getText() + "\n";
+            str += "Objet : " + objetField.getText() + "\n";
+            c.envoiMsg(str + ".\r\n");
+//            c.envoiMsg("Date : " + dateFormat.format(date));
+//            c.envoiMsg("From : " + expediteurField.getText());
+//            c.envoiMsg("To : " + destinataireField.getText());
+//            c.envoiMsg("Objet : " + objetField.getText());
+//            for (String line : data) {
+//                c.envoiMsg(line);
+//            }
+//            c.envoiMsg(".\r\n");
             s = c.receiveResponse();
-            if (!s.startsWith("250")){
+            if (!s.startsWith("250")) {
                 JOptionPane.showMessageDialog(null, "Error during transfering of data.\nConnexion aborted");
                 c.envoiMsg("QUIT");//Deconnexion du client
                 c.receiveResponse();
@@ -287,13 +281,13 @@ public class MailFrame extends javax.swing.JFrame {
             //c = new Client(InetAddress.getLocalHost(), 110);
             c = new Client(InetAddress.getByName("localhost"), 25000);
             //Init client -------------------------------------------------------------
-            if("".equals(expediteurField.getText())) {
+            if ("".equals(expediteurField.getText())) {
                 JOptionPane.showMessageDialog(null, "Veuillez remplir le champs d'expéditeur.");
-            patienterLabel.setVisible(false);
+                patienterLabel.setVisible(false);
                 return;
             }
             String s = c.receiveResponse();//attendu 220 OK
-            if (!s.startsWith("220")){
+            if (!s.startsWith("220")) {
                 JOptionPane.showMessageDialog(null, "Connexion to server failed\n" + s);
                 patienterLabel.setVisible(false);
                 return;
@@ -301,7 +295,7 @@ public class MailFrame extends javax.swing.JFrame {
             String domaine = expediteurField.getText().split("@")[1];//Récupération du nom de domaine
             c.envoiMsg("EHLO " + domaine);//Envoi du EHLO
             s = c.receiveResponse();
-            if (!s.startsWith("250")){
+            if (!s.startsWith("250")) {
                 JOptionPane.showMessageDialog(null, "Connexion to server failed\n" + s);
                 patienterLabel.setVisible(false);
                 return;
@@ -319,8 +313,9 @@ public class MailFrame extends javax.swing.JFrame {
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the
+         * default look and feel. For details see
+         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
