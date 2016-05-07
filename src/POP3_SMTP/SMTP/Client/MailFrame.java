@@ -230,7 +230,7 @@ public class MailFrame extends javax.swing.JFrame {
             }
 
             //Recepteurs valides, envoi du DATA
-            String[] data = mailField.getText().split("\n");
+//            String[] data = mailField.getText().split("\n");
             c.envoiMsg("DATA");
             s = c.receiveResponse();
             if (!s.startsWith("354")) {
@@ -248,7 +248,8 @@ public class MailFrame extends javax.swing.JFrame {
             str += "From : " + expediteurField.getText() + "\n";
             str += "To : " + destinataireField.getText() + "\n";
             str += "Objet : " + objetField.getText() + "\n";
-            c.envoiMsg(str + ".\r\n");
+            str += mailField.getText() + "\n";
+            c.envoiMsg(str + ".");
 //            c.envoiMsg("Date : " + dateFormat.format(date));
 //            c.envoiMsg("From : " + expediteurField.getText());
 //            c.envoiMsg("To : " + destinataireField.getText());

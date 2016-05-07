@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * @author Vlad
  */
 public class Communication extends ObjetConnecte implements Runnable {
-    
+
     public int port_dest;
     public InetAddress address_dest;
     private Socket Sclient;
@@ -35,7 +35,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     private static final String ETAT_ATTENTE_DATA = "attente data";
     private static final String ETAT_ATTENTE_CONTENT = "attente contenu";
     private Email mail;
-    
+
     public Communication(Socket client) throws SocketException {
         super();
         port_dest = client.getPort();
@@ -54,7 +54,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         }
         System.out.println("Communication creee avec le Client : " + address_dest + " | " + port_dest);
     }
-    
+
     @Override
     public void run() {
         byte[] buffer = new byte[256];
@@ -62,33 +62,33 @@ public class Communication extends ObjetConnecte implements Runnable {
         boolean quit_asked = false;
         this.sendMessage(220, "SMTP service ready");
         currentState = ETAT_ATTENTE_EHLO;
-        try{
-        while (!quit_asked) {
-            BIS.read(buffer);
-            received = new String(buffer);
-            switch (currentState) {
-                case ETAT_ATTENTE_EHLO:
-                    quit_asked = manageAttenteEhloState(received);
-                    break;
-                case ETAT_ATTENTE_MAIL:
-                    quit_asked = manageAttenteMailoState(received);
-                    break;
-                case ETAT_ATTENTE_RCPT:
-                    quit_asked = manageAttenteRcptState(received);
-                    break;
-                case ETAT_ATTENTE_DATA:
-                    quit_asked = manageAttenteDataState(received);
-                    break;
-                case ETAT_ATTENTE_CONTENT:
-                    quit_asked = manageAttenteContentState(received);
-                    break;
+        try {
+            while (!quit_asked) {
+                BIS.read(buffer);
+                received = new String(buffer);
+                switch (currentState) {
+                    case ETAT_ATTENTE_EHLO:
+                        quit_asked = manageAttenteEhloState(received);
+                        break;
+                    case ETAT_ATTENTE_MAIL:
+                        quit_asked = manageAttenteMailoState(received);
+                        break;
+                    case ETAT_ATTENTE_RCPT:
+                        quit_asked = manageAttenteRcptState(received);
+                        break;
+                    case ETAT_ATTENTE_DATA:
+                        quit_asked = manageAttenteDataState(received);
+                        break;
+                    case ETAT_ATTENTE_CONTENT:
+                        quit_asked = manageAttenteContentState(received);
+                        break;
+                }
             }
-        }
-        } catch(IOException exception){
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
     }
-    
+
     public boolean manageAttenteEhloState(String received) {
         if (received.startsWith("EHLO")) {
             this.sendMessage(250, "OK");
@@ -104,7 +104,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         }
         return false;
     }
-    
+
     public boolean manageAttenteMailoState(String received) {
         if (received.startsWith("MAIL")) {
             mail.setExpediteur(received.split("<")[1].split(">")[0]);
@@ -124,11 +124,11 @@ public class Communication extends ObjetConnecte implements Runnable {
             //retourner dans attente mail
             clearContext();
             this.sendMessage(503, "bad sequence of command");
-            
+
         }
         return false;
     }
-    
+
     public boolean manageAttenteRcptState(String received) {
         if (received.startsWith("RCPT")) {
             String temp = received.split("<")[1].split(">")[0];
@@ -157,7 +157,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         }
         return false;
     }
-    
+
     public boolean manageAttenteDataState(String received) {
         if (received.startsWith("RCPT")) {
             String temp = received.split("<")[1].split(">")[0];
@@ -186,7 +186,7 @@ public class Communication extends ObjetConnecte implements Runnable {
         }
         return false;
     }
-    
+
     public boolean manageAttenteContentState(String received) {
         if (received.startsWith("<OBJECT>")) {
             mail.setObjet(received.split(">")[1].split("\n")[0]);
@@ -216,12 +216,12 @@ public class Communication extends ObjetConnecte implements Runnable {
                 }
             }
         }
-        
+
         //APPEL AU FILEMANAGER POUR STOCKER LE MAIL
         fileManager.writeMail(mail);
         return false;
     }
-    
+
     /**
      * Méthode d'envoi d'un message au client
      *
@@ -240,13 +240,9 @@ public class Communication extends ObjetConnecte implements Runnable {
             Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-        
+
     public void clearContext() {
         this.mail = new Email();
         currentState = ETAT_ATTENTE_MAIL;
-    }
-    
-    public Email parseMailStringToEmail(String s){
-        return null;
     }
 }
