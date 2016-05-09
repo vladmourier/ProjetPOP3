@@ -132,7 +132,8 @@ public class Communication extends ObjetConnecte implements Runnable {
 
     public boolean manageAttenteRcptState(String received) {
         if (received.startsWith("RCPT")) {
-            String temp = received.split("<")[1].split(">")[0];
+            String temp = received.split("<")[1];//.split("@mysmtp.com>")[0];
+            temp = temp.split("@mysmtp.com")[0];
             if (fileManager.getUserNames().contains(temp)) {
                 mail.addDestinataire(temp);
                 this.sendMessage(250, "receiver ok");
@@ -161,7 +162,7 @@ public class Communication extends ObjetConnecte implements Runnable {
 
     public boolean manageAttenteDataState(String received) {
         if (received.startsWith("RCPT")) {
-            String temp = received.split("<")[1].split(">")[0];
+            String temp = received.split("<")[1].split("@mysmtp.com>")[0];
             if (fileManager.getUserNames().contains(temp)) {
                 mail.addDestinataire(temp);
                 this.sendMessage(250, "receiver ok");
