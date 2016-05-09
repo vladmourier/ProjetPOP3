@@ -65,6 +65,8 @@ public class MailFrame extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         ipField = new javax.swing.JTextField();
         portField = new javax.swing.JTextField();
+        domainField = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,6 +116,15 @@ public class MailFrame extends javax.swing.JFrame {
 
         portField.setText("25000");
 
+        domainField.setText("mysmtp.com");
+        domainField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                domainFieldActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setText("domaine");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -155,12 +166,16 @@ public class MailFrame extends javax.swing.JFrame {
                                 .addGap(26, 26, 26)
                                 .addComponent(testButton))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(ipField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(174, 174, 174)
+                                .addComponent(ipField, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(112, 112, 112)
                                 .addComponent(jLabel6)
                                 .addGap(18, 18, 18)
                                 .addComponent(portField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(domainField, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(122, 122, 122)))
                         .addGap(8, 8, 8)))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -173,7 +188,6 @@ public class MailFrame extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(17, 17, 17)
                 .addComponent(bienvenueLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -189,7 +203,9 @@ public class MailFrame extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel6)
-                                    .addComponent(portField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(portField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(domainField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel7))
                                 .addGap(24, 24, 24)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(expediteurField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -205,7 +221,7 @@ public class MailFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addComponent(patienterLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -254,6 +270,7 @@ public class MailFrame extends javax.swing.JFrame {
             String[] destinataires = destinataireField.getText().split("; ");
             boolean destValide = false;
             for (String dest : destinataires) {
+                if(!dest.endsWith("@" + domainField.getText())) dest += "@" + domainField.getText();
                 c.envoiMsg("RCPT TO:<" + dest + ">");
                 s = c.receiveResponse();
                 destValide = destValide || (s.startsWith("250")); //au moins 1 destinataire valide.
@@ -339,7 +356,7 @@ public class MailFrame extends javax.swing.JFrame {
                 patienterLabel.setVisible(false);
                 return;
             }
-            String domaine = expediteurField.getText().split("@")[1];//Récupération du nom de domaine
+            String domaine = domainField.getText(); //expediteurField.getText().split("@")[1];//Récupération du nom de domaine
             c.envoiMsg("EHLO " + domaine);//Envoi du EHLO
             s = c.receiveResponse();
             if (!s.startsWith("250")) {
@@ -355,6 +372,10 @@ public class MailFrame extends javax.swing.JFrame {
         envoiButton.setEnabled(true);
         patienterLabel.setVisible(false);
     }//GEN-LAST:event_testButtonActionPerformed
+
+    private void domainFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_domainFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_domainFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -395,6 +416,7 @@ public class MailFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bienvenueLabel;
     private javax.swing.JTextField destinataireField;
+    private javax.swing.JTextField domainField;
     private javax.swing.JButton envoiButton;
     private javax.swing.JTextField expediteurField;
     private javax.swing.JTextField ipField;
@@ -404,6 +426,7 @@ public class MailFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea mailField;
     private javax.swing.JTextField objetField;
