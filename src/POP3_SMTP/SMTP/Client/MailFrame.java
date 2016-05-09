@@ -347,6 +347,7 @@ public class MailFrame extends javax.swing.JFrame {
                 patienterLabel.setVisible(false);
                 return;
             }
+            JOptionPane.showMessageDialog(null, "Connexion to server succeded\n" + s);
         } catch (IOException ex) {
             Logger.getLogger(MailFrame.class.getName()).log(Level.SEVERE, null, ex);
             envoiButton.setEnabled(false);
