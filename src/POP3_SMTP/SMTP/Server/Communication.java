@@ -247,9 +247,10 @@ public class Communication extends ObjetConnecte implements Runnable {
             } else if (line.startsWith("<OBJECT>")) {
                 mail.setObjet(line.substring("Objet : ".length()));
                 obj = true;
-            } else
-            if(obj == true && !line.equals(".")){
-                mail.setMessage(mail.getMessage() != null ? mail.getMessage()+line+"\n" : line);
+            } else {
+                if (obj == true && !line.equals(".")) {
+                    mail.setMessage(mail.getMessage() != null ? mail.getMessage() + line + "\n" : line);
+                }
             }
         }
     }
