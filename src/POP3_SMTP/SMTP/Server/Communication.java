@@ -188,18 +188,8 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
 
     public boolean manageAttenteContentState(String received) {
-        if (received.startsWith("<OBJECT>")) {
-            mail.setObjet(received.split(">")[1].split("\n")[0]);
-            String[] corps = received.split("\n");
-            for (int i = 2; i < corps.length; i++) {
-                if (!corps[i].equals(".")) {
-                    if (mail.getMessage().length() != 0) {
-                        mail.setMessage(mail.getMessage() + "\n" + corps[i]);
-                    } else {
-                        mail.setMessage(corps[i]);
-                    }
-                }
-            }
+        if (received.startsWith("<OBJECT>") || received.startsWith("Date")) {
+            parseContentMessage(received);
         } else if (received.startsWith("QUIT")) {
             sendMessage(250, "server is disconnecting");
             return true;
@@ -244,5 +234,23 @@ public class Communication extends ObjetConnecte implements Runnable {
     public void clearContext() {
         this.mail = new Email();
         currentState = ETAT_ATTENTE_MAIL;
+    }
+
+    public void parseContentMessage(String content) {
+        String[] lines = content.split("\n");
+        boolean obj = false;
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            if (line.startsWith("Objet :")) {
+                mail.setObjet(line.substring("Objet : ".length()));
+                obj = true;
+            } else if (line.startsWith("<OBJECT>")) {
+                mail.setObjet(line.substring("Objet : ".length()));
+                obj = true;
+            } else
+            if(obj == true && !line.equals(".")){
+                mail.setMessage(mail.getMessage() != null ? mail.getMessage()+line+"\n" : line);
+            }
+        }
     }
 }
