@@ -280,6 +280,7 @@ public class MailFrame extends javax.swing.JFrame {
     private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
         try {
             //c = new Client(InetAddress.getLocalHost(), 110);
+            patienterLabel.setVisible(true);
             c = new Client(InetAddress.getByName("localhost"), 25000);
             //Init client -------------------------------------------------------------
             if ("".equals(expediteurField.getText())) {
@@ -306,6 +307,7 @@ public class MailFrame extends javax.swing.JFrame {
             envoiButton.setEnabled(false);
         }
         envoiButton.setEnabled(true);
+        patienterLabel.setVisible(true);
     }//GEN-LAST:event_testButtonActionPerformed
 
     /**
