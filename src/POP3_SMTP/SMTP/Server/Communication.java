@@ -210,6 +210,8 @@ public class Communication extends ObjetConnecte implements Runnable {
 
         //APPEL AU FILEMANAGER POUR STOCKER LE MAIL
         fileManager.writeMail(mail);
+        sendMessage(250, "message reçu");
+        clearContext();
         return false;
     }
 
@@ -248,7 +250,7 @@ public class Communication extends ObjetConnecte implements Runnable {
             } else if (line.startsWith("<OBJECT>")) {
                 mail.setObjet(line.substring("Objet : ".length()));
                 obj = true;
-            } else if (obj == true && !line.equals(".")) {
+            } else if (obj == true && !line.equals(".\r")) {
                 mail.setMessage(mail.getMessage() != null ? mail.getMessage() + line + "\n" : line);
             }
 

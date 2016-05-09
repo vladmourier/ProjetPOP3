@@ -161,7 +161,7 @@ public class Email {
                 + "RCPT TO:" + dest + "\r\n"
                 + "<OBJECT>" + objet + "\r\n\r\n"
                 + this.message
-                + "\r\n.\r\n";
+                + ".\r\n";
         return s;
     }
 }
