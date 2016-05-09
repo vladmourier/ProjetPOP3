@@ -23,6 +23,7 @@ import java.util.logging.Logger;
  */
 public class Communication extends ObjetConnecte implements Runnable {
 
+    private static final String DOMAIN_NAME = "mysmtp.com";
     public int port_dest;
     public InetAddress address_dest;
     private Socket Sclient;
@@ -90,7 +91,7 @@ public class Communication extends ObjetConnecte implements Runnable {
     }
 
     public boolean manageAttenteEhloState(String received) {
-        if (received.startsWith("EHLO")) {
+        if (received.startsWith("EHLO") && received.contains(DOMAIN_NAME)) {
             this.sendMessage(250, "OK");
             currentState = ETAT_ATTENTE_MAIL;
         } else if (received.startsWith("QUIT")) {
@@ -247,11 +248,10 @@ public class Communication extends ObjetConnecte implements Runnable {
             } else if (line.startsWith("<OBJECT>")) {
                 mail.setObjet(line.substring("Objet : ".length()));
                 obj = true;
-            } else {
-                if (obj == true && !line.equals(".")) {
-                    mail.setMessage(mail.getMessage() != null ? mail.getMessage() + line + "\n" : line);
-                }
+            } else if (obj == true && !line.equals(".")) {
+                mail.setMessage(mail.getMessage() != null ? mail.getMessage() + line + "\n" : line);
             }
+
         }
     }
 }
